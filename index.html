@@ -473,7 +473,7 @@
     <script>
         (function() {
             // ============================================================
-            //  音乐文件名（请确保与 HTML 同目录）
+            //  音乐文件名（请确保与 HTML 同目录，大小写和空格完全一致）
             // ============================================================
             const musicUrl = "Christina Perri - a thousand years.mp3";
 
@@ -517,7 +517,8 @@
             let audio = null;
             let isMusicPlaying = false;
             let musicReady = false;
-            let isDragging = false; // 是否正在拖动进度条
+            let isDragging = false;
+            let playAttempted = false; // 标记是否已尝试过自动播放或用户交互播放
 
             // 动态生成幻灯片及小圆点
             function buildSlider() {
@@ -603,7 +604,7 @@
             }
 
             // ============================================================
-            //  ★★★ 音乐播放器（自动播放 + 进度条） ★★★
+            //  ★★★ 音乐播放器（自动播放 + 用户交互触发） ★★★
             // ============================================================
             function initMusic() {
                 if (audio) return;
@@ -622,11 +623,11 @@
                     }
                 });
 
-                // 可以播放时标记就绪
+                // 可以播放时标记就绪并尝试自动播放
                 audio.addEventListener('canplaythrough', function() {
                     musicReady = true;
-                    // 自动播放（如果尚未播放）
-                    if (!isMusicPlaying) {
+                    if (!playAttempted) {
+                        playAttempted = true;
                         autoPlay();
                     }
                 });
@@ -652,15 +653,18 @@
                     }
                 });
 
-                // 错误处理（静默）
+                // 错误处理（静默记录，不影响界面）
                 audio.addEventListener('error', function(e) {
-                    console.warn('音乐加载失败，请检查文件路径', e);
+                    console.warn('音乐加载失败，请检查文件路径和文件名', e);
                 });
 
-                // 立即尝试自动播放（如果已经 ready）
+                // 如果音频已经 ready，直接自动播放
                 if (audio.readyState >= 2) {
                     musicReady = true;
-                    autoPlay();
+                    if (!playAttempted) {
+                        playAttempted = true;
+                        autoPlay();
+                    }
                 }
             }
 
@@ -676,12 +680,29 @@
             function autoPlay() {
                 if (!audio) return;
                 audio.play().catch(function(err) {
-                    // 自动播放被阻止，静默失败，用户可点击按钮播放
-                    console.log('自动播放被阻止（浏览器策略），用户可手动播放');
+                    // 自动播放被阻止，等待用户手势
+                    console.log('自动播放被阻止（浏览器策略），等待用户交互');
                 });
             }
 
-            // 切换播放/暂停
+            // 用户手势触发播放（首次点击页面任意位置）
+            function playOnUserGesture() {
+                if (!audio) {
+                    initMusic();
+                    // 等待初始化完成后再尝试
+                    setTimeout(function() {
+                        if (audio && !isMusicPlaying) {
+                            audio.play().catch(() => {});
+                        }
+                    }, 300);
+                    return;
+                }
+                if (musicReady && !isMusicPlaying) {
+                    audio.play().catch(() => {});
+                }
+            }
+
+            // 切换播放/暂停（按钮点击）
             function togglePlay() {
                 if (!audio) {
                     initMusic();
@@ -714,13 +735,11 @@
                 const seekTime = (val / 100) * audio.duration;
                 audio.currentTime = seekTime;
                 currentTimeElem.textContent = formatTime(seekTime);
-                // 松开后允许 timeupdate 更新
                 setTimeout(function() {
                     isDragging = false;
                 }, 200);
             }
 
-            // 进度条拖动中（连续更新显示时间）
             function handleProgressInput() {
                 if (!audio || isNaN(audio.duration)) return;
                 const val = parseFloat(progressBar.value);
@@ -952,36 +971,51 @@
             nextBtn.addEventListener('click', nextSlide);
             resetAutoSlide();
 
-            // 播放按钮
+            // 音乐按钮点击
             musicToggleBtn.addEventListener('click', togglePlay);
 
             // 进度条事件
             progressBar.addEventListener('input', handleProgressInput);
             progressBar.addEventListener('change', handleProgressChange);
 
-            // 微信环境特殊处理
+            // ★★★ 关键：监听用户首次触摸/点击页面任意位置，触发音乐播放 ★★★
+            // 使用 'once' 确保只触发一次，避免重复绑定
+            document.addEventListener('touchstart', function onFirstTouch() {
+                playOnUserGesture();
+                document.removeEventListener('touchstart', onFirstTouch);
+            }, { passive: true });
+
+            document.addEventListener('click', function onFirstClick() {
+                playOnUserGesture();
+                document.removeEventListener('click', onFirstClick);
+            }, { passive: true });
+
+            // 微信环境特殊处理（WeixinJSBridgeReady）
             if (typeof WeixinJSBridge !== 'undefined') {
                 document.addEventListener('WeixinJSBridgeReady', function() {
                     if (!audio) initMusic();
+                    // 微信中可以直接播放（但可能仍需手势）
                     if (audio && musicReady && !isMusicPlaying) {
                         audio.play().catch(() => {});
                     }
                 });
             }
 
-            // 页面加载完成后初始化音乐并自动播放
+            // 页面加载完成后初始化音乐
             window.addEventListener('load', function() {
                 initMusic();
-                // 如果音频已 ready，再次尝试自动播放
+                // 如果音频已 ready，尝试自动播放（可能被阻止）
                 if (audio && audio.readyState >= 2) {
-                    autoPlay();
+                    if (!playAttempted) {
+                        playAttempted = true;
+                        autoPlay();
+                    }
                 }
-                // 即使自动播放被阻止，也不显示提示，用户可点击按钮
             });
 
             console.log('❤️ 生日祝福页面已加载 ❤️');
-            console.log('💡 音乐文件: Christina Perri - a thousand years.mp3');
-            console.log('💡 页面将自动尝试播放音乐，若被浏览器拦截，请点击播放按钮');
+            console.log('💡 音乐文件: ' + musicUrl);
+            console.log('💡 提示：微信内首次打开需点击页面任意位置激活音乐');
         })();
     </script>
 </body>
