@@ -8,6 +8,7 @@
     <meta content="telephone=no" name="format-detection" />
     <title>❤️ 生日快乐，我的宝贝 ❤️</title>
     <style>
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -28,7 +29,7 @@
             overflow-x: hidden;
         }
 
-        /* 飘浮爱心背景 */
+        /* ===== 飘浮爱心背景 ===== */
         .floating-hearts {
             position: fixed;
             top: 0;
@@ -65,7 +66,7 @@
             }
         }
 
-        /* 主卡片容器 */
+        /* ===== 主卡片容器 ===== */
         .birthday-card {
             max-width: 1300px;
             width: 100%;
@@ -78,7 +79,7 @@
             transition: all 0.3s ease;
         }
 
-        /* 主内容网格布局 */
+        /* ===== 主内容网格 ===== */
         .content-grid {
             display: grid;
             grid-template-columns: 1fr 0.9fr;
@@ -86,7 +87,7 @@
             align-items: center;
         }
 
-        /* 左侧照片轮播区域 */
+        /* ===== 左侧照片轮播 ===== */
         .photo-slider {
             background: rgba(255, 255, 255, 0.4);
             border-radius: 32px;
@@ -156,12 +157,11 @@
         .slider-btn.prev {
             left: 12px;
         }
-
         .slider-btn.next {
             right: 12px;
         }
 
-        /* 轮播指示器 */
+        /* 轮播指示点 */
         .slider-dots {
             display: flex;
             justify-content: center;
@@ -185,7 +185,7 @@
             background: #ff4757;
         }
 
-        /* 右侧情话语录区域 */
+        /* ===== 右侧情话语录 ===== */
         .love-quotes {
             background: rgba(255, 248, 245, 0.85);
             backdrop-filter: blur(12px);
@@ -223,7 +223,7 @@
             letter-spacing: 2px;
         }
 
-        /* ===== 音乐控制区（新样式） ===== */
+        /* ===== 音乐控制区 ===== */
         .music-control {
             margin-top: 20px;
             display: flex;
@@ -259,7 +259,6 @@
             border-color: #ff6b81;
         }
 
-        /* 进度条容器 */
         .progress-container {
             flex: 1;
             min-width: 120px;
@@ -276,7 +275,6 @@
             border-radius: 4px;
             background: rgba(255, 107, 129, 0.3);
             outline: none;
-            transition: background 0.2s;
             cursor: pointer;
         }
 
@@ -306,11 +304,10 @@
             white-space: nowrap;
             min-width: 80px;
             text-align: center;
-            letter-spacing: 0.3px;
             font-variant-numeric: tabular-nums;
         }
 
-        /* Canvas爱心特效区域 */
+        /* ===== 爱心粒子画布 ===== */
         .heart-canvas-wrapper {
             margin-top: 30px;
             text-align: center;
@@ -323,7 +320,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* 终极爱心烟花动画层 */
+        /* ===== 终极烟花层 ===== */
         .final-animation-layer {
             position: fixed;
             top: 0;
@@ -366,13 +363,8 @@
         }
 
         @keyframes glowPulse {
-            0%,
-            100% {
-                text-shadow: 0 0 20px #ff6b81;
-            }
-            50% {
-                text-shadow: 0 0 40px #ff4757, 0 0 60px #ff6b81;
-            }
+            0%, 100% { text-shadow: 0 0 20px #ff6b81; }
+            50% { text-shadow: 0 0 40px #ff4757, 0 0 60px #ff6b81; }
         }
 
         .close-final {
@@ -388,7 +380,7 @@
             transition: 0.3s;
         }
 
-        /* 手机响应式适配 */
+        /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -424,29 +416,27 @@
     </style>
 </head>
 <body>
-
+    <!-- 背景浮动爱心 -->
     <div class="floating-hearts" id="floatingHearts"></div>
 
+    <!-- 主卡片 -->
     <div class="birthday-card">
         <div class="content-grid">
-            <!-- 左侧照片轮播区 -->
+            <!-- 左侧轮播 -->
             <div class="photo-slider">
                 <div class="slider-container">
-                    <div class="slider-images" id="sliderImages">
-                        <!-- 照片由 JS 动态生成 -->
-                    </div>
+                    <div class="slider-images" id="sliderImages"></div>
                     <button class="slider-btn prev" id="prevBtn">‹</button>
                     <button class="slider-btn next" id="nextBtn">›</button>
                 </div>
                 <div class="slider-dots" id="sliderDots"></div>
             </div>
 
-            <!-- 右侧情话语录区 -->
-            <div class="love-quotes" id="loveQuotes">
+            <!-- 右侧情话 + 音乐 -->
+            <div class="love-quotes">
                 <div class="quote-icon">🌸💖🌸</div>
                 <div class="quote-text" id="quoteText">爱你是最美的冒险</div>
                 <div class="quote-author">— To My Love —</div>
-                <!-- 音乐控制区域（含进度条） -->
                 <div class="music-control">
                     <button class="music-btn" id="musicToggleBtn">🎵 播放</button>
                     <div class="progress-container">
@@ -457,13 +447,13 @@
             </div>
         </div>
 
-        <!-- 爱心粒子特效画布 -->
+        <!-- 爱心粒子 -->
         <div class="heart-canvas-wrapper">
-            <canvas id="heartCanvas" width="400" height="300" style="width:100%; height:auto; max-width:500px; aspect-ratio:400/300"></canvas>
+            <canvas id="heartCanvas" width="400" height="300"></canvas>
         </div>
     </div>
 
-    <!-- 终极爱心烟花动画层 -->
+    <!-- 终极烟花 -->
     <div class="final-animation-layer" id="finalLayer">
         <canvas id="fireworkCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
         <div class="final-blessing">
@@ -475,11 +465,10 @@
 
     <script>
         (function() {
-            // ============================================================
-            //  配置
-            // ============================================================
+            // ============================
+            // 配置（请按需修改）
+            // ============================
             const musicUrl = "Christina Perri - a thousand years.mp3";
-
             const photos = [
                 "photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg", "photo5.jpg",
                 "photo6.jpg", "photo7.jpg", "photo8.jpg", "photo9.jpg", "photo10.jpg",
@@ -502,7 +491,7 @@
                 "🎂 宝贝，生日快乐，今天你是全世界最幸福的女孩"
             ];
 
-            // ---------- DOM ----------
+            // DOM 引用
             const sliderImages = document.getElementById('sliderImages');
             const sliderDots = document.getElementById('sliderDots');
             const prevBtn = document.getElementById('prevBtn');
@@ -517,11 +506,11 @@
             let audio = null;
             let isMusicPlaying = false;
             let musicReady = false;
-            let isSeeking = false; // 是否正在拖动进度条
+            let isSeeking = false;
 
-            // ============================================================
-            //  轮播
-            // ============================================================
+            // ============================
+            // 轮播构建
+            // ============================
             function buildSlider() {
                 sliderImages.innerHTML = '';
                 photos.forEach((photo, idx) => {
@@ -548,13 +537,11 @@
             function updateActiveSlide(index) {
                 const slides = document.querySelectorAll('.slide');
                 slides.forEach((slide, i) => {
-                    if (i === index) slide.classList.add('active');
-                    else slide.classList.remove('active');
+                    slide.classList.toggle('active', i === index);
                 });
                 const dots = document.querySelectorAll('.dot');
                 dots.forEach((dot, i) => {
-                    if (i === index) dot.classList.add('active');
-                    else dot.classList.remove('active');
+                    dot.classList.toggle('active', i === index);
                 });
                 if (quotes[index]) {
                     quoteTextElem.style.opacity = '0';
@@ -562,12 +549,9 @@
                         quoteTextElem.innerText = quotes[index];
                         quoteTextElem.style.opacity = '1';
                     }, 150);
-                } else {
-                    quoteTextElem.innerText = "💖 永远爱你 💖";
                 }
             }
 
-            // ★★★ 核心：切换图片时触发音乐播放 ★★★
             function goToSlide(index) {
                 if (index < 0) index = photos.length - 1;
                 if (index >= photos.length) {
@@ -577,23 +561,15 @@
                 currentIndex = index;
                 updateActiveSlide(currentIndex);
                 resetAutoSlide();
-                // 每次切换图片，尝试播放音乐（如果音乐已加载且未播放）
-                tryPlayMusicOnSlideChange();
+                tryPlayMusic(); // 每次切换图片尝试播放音乐
             }
 
             function nextSlide() {
-                let nextIdx = currentIndex + 1;
-                if (nextIdx >= photos.length) {
-                    triggerFinalAnimation();
-                    return;
-                }
-                goToSlide(nextIdx);
+                goToSlide(currentIndex + 1);
             }
 
             function prevSlide() {
-                let prevIdx = currentIndex - 1;
-                if (prevIdx < 0) prevIdx = 0;
-                goToSlide(prevIdx);
+                goToSlide(currentIndex - 1);
             }
 
             function resetAutoSlide() {
@@ -607,9 +583,9 @@
                 }, 5500);
             }
 
-            // ============================================================
-            //  音乐播放逻辑（与切换联动）
-            // ============================================================
+            // ============================
+            // 音乐控制
+            // ============================
             function initMusic() {
                 if (audio) return;
                 audio = document.createElement('audio');
@@ -619,86 +595,57 @@
                 audio.src = encodeURI(musicUrl);
                 document.body.appendChild(audio);
 
-                audio.addEventListener('canplaythrough', function() {
+                audio.addEventListener('canplaythrough', () => {
                     musicReady = true;
-                    // 如果当前有图片显示，立即尝试播放
-                    tryPlayMusicOnSlideChange();
+                    tryPlayMusic();
                 });
 
-                audio.addEventListener('error', function(e) {
-                    console.error('音乐加载失败:', e);
+                audio.addEventListener('error', () => {
+                    console.warn('音乐加载失败，请检查文件路径');
                 });
 
-                // 更新进度条
-                audio.addEventListener('timeupdate', function() {
+                audio.addEventListener('timeupdate', () => {
                     if (!isSeeking && audio.duration) {
-                        const progress = (audio.currentTime / audio.duration) * 100;
-                        musicProgress.value = progress;
+                        musicProgress.value = (audio.currentTime / audio.duration) * 100;
                         updateTimeDisplay(audio.currentTime, audio.duration);
                     }
                 });
 
-                audio.addEventListener('loadedmetadata', function() {
+                audio.addEventListener('loadedmetadata', () => {
                     updateTimeDisplay(0, audio.duration);
                 });
 
-                audio.addEventListener('play', function() {
+                audio.addEventListener('play', () => {
                     isMusicPlaying = true;
                     musicToggleBtn.textContent = '🔊 暂停';
                     musicToggleBtn.classList.add('playing');
                 });
 
-                audio.addEventListener('pause', function() {
+                audio.addEventListener('pause', () => {
                     isMusicPlaying = false;
                     musicToggleBtn.textContent = '🎵 播放';
                     musicToggleBtn.classList.remove('playing');
                 });
 
-                // 尝试加载
                 audio.load();
             }
 
-            // 在切换图片时调用此函数，尝试播放音乐
-            function tryPlayMusicOnSlideChange() {
-                if (!audio) {
-                    initMusic();
-                    // 延迟再试一次
-                    setTimeout(() => {
-                        if (audio && musicReady && !isMusicPlaying) {
-                            audio.play().catch(() => {});
-                        }
-                    }, 300);
-                    return;
-                }
+            function tryPlayMusic() {
+                if (!audio) { initMusic(); return; }
                 if (musicReady && !isMusicPlaying) {
-                    audio.play().catch(err => {
-                        // 被浏览器阻止时静默处理，用户点击播放按钮仍可生效
-                    });
+                    audio.play().catch(() => {});
                 }
             }
 
-            // 播放/暂停按钮
             function toggleMusic() {
-                if (!audio) {
-                    initMusic();
-                    setTimeout(() => {
-                        if (audio) toggleMusic();
-                    }, 300);
-                    return;
-                }
+                if (!audio) { initMusic(); setTimeout(toggleMusic, 300); return; }
                 if (musicReady) {
-                    if (isMusicPlaying) {
-                        audio.pause();
-                    } else {
-                        audio.play().catch(() => {});
-                    }
+                    isMusicPlaying ? audio.pause() : audio.play().catch(() => {});
                 } else {
-                    // 如果未加载完成，尝试加载
                     audio.load();
                 }
             }
 
-            // 进度条拖动
             function setupProgressBar() {
                 musicProgress.addEventListener('input', function() {
                     isSeeking = true;
@@ -710,22 +657,17 @@
                 musicProgress.addEventListener('change', function() {
                     isSeeking = false;
                     if (audio && audio.duration) {
-                        const seekTime = (parseFloat(this.value) / 100) * audio.duration;
-                        audio.currentTime = seekTime;
-                        if (!isMusicPlaying) {
-                            // 如果暂停状态，拖动后不自动播放，只改变时间
-                        }
+                        audio.currentTime = (parseFloat(this.value) / 100) * audio.duration;
                     }
                 });
-                // 点击进度条跳转（兼容触摸）
+                // 点击跳转（移动端支持）
                 musicProgress.addEventListener('click', function(e) {
                     if (audio && audio.duration) {
                         const rect = this.getBoundingClientRect();
                         const x = (e.clientX - rect.left) / rect.width;
-                        const seekTime = x * audio.duration;
-                        audio.currentTime = seekTime;
+                        audio.currentTime = x * audio.duration;
                         musicProgress.value = x * 100;
-                        updateTimeDisplay(seekTime, audio.duration);
+                        updateTimeDisplay(audio.currentTime, audio.duration);
                     }
                 });
             }
@@ -740,40 +682,38 @@
                 timeDisplay.textContent = `${fmt(current)} / ${fmt(duration)}`;
             }
 
-            // ============================================================
-            //  终极动画
-            // ============================================================
+            // ============================
+            // 终极烟花
+            // ============================
             let finalTriggered = false;
 
             function triggerFinalAnimation() {
                 if (finalTriggered) return;
                 finalTriggered = true;
                 if (slideInterval) clearInterval(slideInterval);
-                const finalLayer = document.getElementById('finalLayer');
-                finalLayer.classList.add('show');
+                document.getElementById('finalLayer').classList.add('show');
                 initFireworks();
             }
 
             window.closeFinalLayer = function() {
-                const finalLayer = document.getElementById('finalLayer');
-                finalLayer.classList.remove('show');
+                document.getElementById('finalLayer').classList.remove('show');
                 cancelFireworks();
             };
 
-            // ============================================================
-            //  爱心粒子 Canvas
-            // ============================================================
+            // ============================
+            // 爱心粒子画布
+            // ============================
             const canvas = document.getElementById('heartCanvas');
             const ctx = canvas.getContext('2d');
-            let width = canvas.clientWidth;
-            let height = canvas.clientHeight;
+            let w = canvas.clientWidth || 400,
+                h = canvas.clientHeight || 300;
 
             function resizeCanvas() {
                 const rect = canvas.parentElement.getBoundingClientRect();
-                width = Math.min(rect.width * 0.9, 500);
-                height = width * 0.75;
-                canvas.width = width;
-                canvas.height = height;
+                w = Math.min(rect.width * 0.9, 500);
+                h = w * 0.75;
+                canvas.width = w;
+                canvas.height = h;
             }
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
@@ -813,15 +753,13 @@
 
             function generateHeartPoints() {
                 const points = [];
-                const scale = Math.min(width, height) * 0.38;
-                const cx = width / 2,
-                    cy = height / 2 - 5;
+                const scale = Math.min(w, h) * 0.38;
+                const cx = w / 2,
+                    cy = h / 2 - 5;
                 for (let t = 0; t <= Math.PI * 2; t += 0.08) {
                     let x = 16 * Math.pow(Math.sin(t), 3);
                     let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-                    let px = cx + x * scale / 16;
-                    let py = cy - y * scale / 16;
-                    points.push({ x: px, y: py });
+                    points.push({ x: cx + x * scale / 16, y: cy - y * scale / 16 });
                 }
                 return points;
             }
@@ -829,38 +767,35 @@
             function initHeartParticles() {
                 heartPoints = generateHeartPoints();
                 for (let i = 0; i < 400; i++) {
-                    let rand = Math.floor(Math.random() * heartPoints.length);
-                    let base = heartPoints[rand];
-                    let angle = Math.random() * Math.PI * 2;
-                    let speed = 0.6 + Math.random() * 1.2;
-                    let vx = Math.cos(angle) * speed;
-                    let vy = Math.sin(angle) * speed - 1.2;
-                    let size = 2 + Math.random() * 4;
-                    let particle = new Particle(base.x, base.y, vx, vy, size, 0.85);
-                    particles.push(particle);
+                    const base = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 0.6 + Math.random() * 1.2;
+                    particles.push(new Particle(
+                        base.x, base.y,
+                        Math.cos(angle) * speed,
+                        Math.sin(angle) * speed - 1.2,
+                        2 + Math.random() * 4,
+                        0.85
+                    ));
                 }
             }
 
             function animateHeart() {
-                if (!ctx) return;
-                ctx.clearRect(0, 0, width, height);
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.shadowBlur = 0;
+                ctx.clearRect(0, 0, w, h);
                 for (let i = particles.length - 1; i >= 0; i--) {
-                    let keep = particles[i].update();
-                    particles[i].draw(ctx);
-                    if (!keep) {
-                        particles.splice(i, 1);
-                        let rand = Math.floor(Math.random() * heartPoints.length);
-                        let base = heartPoints[rand];
-                        let angle = Math.random() * Math.PI * 2;
-                        let speed = 0.5 + Math.random();
-                        let vx = Math.cos(angle) * speed;
-                        let vy = Math.sin(angle) * speed - 0.8;
-                        let size = 2 + Math.random() * 3.5;
-                        let newParticle = new Particle(base.x, base.y, vx, vy, size, 0.8);
-                        particles.push(newParticle);
+                    if (!particles[i].update()) {
+                        const base = heartPoints[Math.floor(Math.random() * heartPoints.length)];
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 0.5 + Math.random();
+                        particles[i] = new Particle(
+                            base.x, base.y,
+                            Math.cos(angle) * speed,
+                            Math.sin(angle) * speed - 0.8,
+                            2 + Math.random() * 3.5,
+                            0.8
+                        );
                     }
+                    particles[i].draw(ctx);
                 }
                 requestAnimationFrame(animateHeart);
             }
@@ -868,971 +803,120 @@
             initHeartParticles();
             animateHeart();
 
-            // ============================================================
-            //  烟花特效
-            // ============================================================
-            let fireworkCtx, fireworkCanvas, fireworkAnimationId;
+            // ============================
+            // 烟花特效
+            // ============================
+            let fwCtx, fwCanvas, fwId;
 
             function initFireworks() {
-                fireworkCanvas = document.getElementById('fireworkCanvas');
-                if (!fireworkCanvas) return;
-                fireworkCanvas.width = window.innerWidth;
-                fireworkCanvas.height = window.innerHeight;
-                fireworkCtx = fireworkCanvas.getContext('2d');
+                fwCanvas = document.getElementById('fireworkCanvas');
+                if (!fwCanvas) return;
+                fwCanvas.width = window.innerWidth;
+                fwCanvas.height = window.innerHeight;
+                fwCtx = fwCanvas.getContext('2d');
                 let fParticles = [];
 
-                function createFireworkExplosion(x, y) {
+                function createExplosion(x, y) {
                     for (let i = 0; i < 80; i++) {
-                        let angle = Math.random() * Math.PI * 2;
-                        let speed = 2 + Math.random() * 5;
-                        let vx = Math.cos(angle) * speed;
-                        let vy = Math.sin(angle) * speed;
-                        let life = 1;
-                        let color = `hsl(${Math.random() * 60 + 340}, 90%, 65%)`;
-                        fParticles.push({ x, y, vx, vy, life, color, size: 3 + Math.random() * 4 });
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = 2 + Math.random() * 5;
+                        fParticles.push({
+                            x,
+                            y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            life: 1,
+                            color: `hsl(${Math.random() * 60 + 340}, 90%, 65%)`,
+                            size: 3 + Math.random() * 4
+                        });
                     }
                 }
-                for (let burst = 0; burst < 8; burst++) {
-                    let randX = Math.random() * fireworkCanvas.width;
-                    let randY = Math.random() * fireworkCanvas.height * 0.6 + 50;
-                    createFireworkExplosion(randX, randY);
+
+                for (let i = 0; i < 8; i++) {
+                    createExplosion(
+                        Math.random() * fwCanvas.width,
+                        Math.random() * fwCanvas.height * 0.6 + 50
+                    );
                 }
 
-                function updateFireworks() {
-                    if (!fireworkCtx) return;
-                    fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
-                    let allDead = true;
-                    for (let i = 0; i < fParticles.length; i++) {
-                        let p = fParticles[i];
+                function update() {
+                    fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+                    let alive = false;
+                    for (let p of fParticles) {
                         p.x += p.vx;
                         p.y += p.vy;
                         p.vy += 0.1;
                         p.life -= 0.015;
                         if (p.life > 0) {
-                            allDead = false;
-                            fireworkCtx.globalAlpha = p.life;
-                            fireworkCtx.fillStyle = p.color;
-                            fireworkCtx.beginPath();
-                            fireworkCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                            fireworkCtx.fill();
+                            alive = true;
+                            fwCtx.globalAlpha = p.life;
+                            fwCtx.fillStyle = p.color;
+                            fwCtx.beginPath();
+                            fwCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                            fwCtx.fill();
                         }
                     }
-                    if (!allDead) {
-                        fireworkAnimationId = requestAnimationFrame(updateFireworks);
-                    } else {
-                        fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
-                    }
+                    if (alive) fwId = requestAnimationFrame(update);
                 }
-                if (fireworkAnimationId) cancelAnimationFrame(fireworkAnimationId);
-                updateFireworks();
+                if (fwId) cancelAnimationFrame(fwId);
+                update();
                 window.addEventListener('resize', () => {
-                    if (fireworkCanvas) {
-                        fireworkCanvas.width = window.innerWidth;
-                        fireworkCanvas.height = window.innerHeight;
+                    if (fwCanvas) {
+                        fwCanvas.width = window.innerWidth;
+                        fwCanvas.height = window.innerHeight;
                     }
                 });
             }
 
             function cancelFireworks() {
-                if (fireworkAnimationId) cancelAnimationFrame(fireworkAnimationId);
-                if (fireworkCtx) fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
+                if (fwId) cancelAnimationFrame(fwId);
+                if (fwCtx) fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
             }
 
-            // ============================================================
-            //  飘浮爱心
-            // ============================================================
+            // ============================
+            // 浮动爱心
+            // ============================
             function generateFloatingHearts() {
                 const container = document.getElementById('floatingHearts');
                 setInterval(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart-bg';
-                    heart.innerHTML = ['❤️', '💖', '💗', '💓', '💕', '🌸', '🎀', '✨', '🌟'][Math.floor(Math.random() * 9)];
-                    heart.style.left = Math.random() * 100 + '%';
-                    heart.style.fontSize = (16 + Math.random() * 30) + 'px';
-                    heart.style.animationDuration = (5 + Math.random() * 8) + 's';
-                    heart.style.animationDelay = Math.random() * 3 + 's';
-                    container.appendChild(heart);
-                    setTimeout(() => { if (heart.parentNode) heart.remove(); }, 11000);
+                    const el = document.createElement('div');
+                    el.className = 'heart-bg';
+                    el.innerHTML = ['❤️', '💖', '💗', '💓', '💕', '🌸', '🎀', '✨', '🌟'][Math.floor(Math.random() * 9)];
+                    el.style.left = Math.random() * 100 + '%';
+                    el.style.fontSize = (16 + Math.random() * 30) + 'px';
+                    el.style.animationDuration = (5 + Math.random() * 8) + 's';
+                    el.style.animationDelay = Math.random() * 3 + 's';
+                    container.appendChild(el);
+                    setTimeout(() => el.remove(), 11000);
                 }, 800);
             }
             generateFloatingHearts();
 
-            // ============================================================
-            //  初始化
-            // ============================================================
+            // ============================
+            // 启动
+            // ============================
             buildSlider();
             updateActiveSlide(0);
             prevBtn.addEventListener('click', prevSlide);
             nextBtn.addEventListener('click', nextSlide);
             resetAutoSlide();
 
-            // 音乐相关
             musicToggleBtn.addEventListener('click', toggleMusic);
             setupProgressBar();
 
-            // 页面加载时初始化音乐，但不自动播放（等待第一次切换）
             window.addEventListener('load', function() {
                 initMusic();
-                // 第一次加载后，尝试播放（但可能被阻止），后续切换会再次尝试
-                setTimeout(() => {
-                    tryPlayMusicOnSlideChange();
-                }, 500);
+                setTimeout(tryPlayMusic, 500);
             });
-
-            // 微信环境
-            if (typeof WeixinJSBridge !== 'undefined') {
-                document.addEventListener('WeixinJSBridgeReady', function() {
-                    if (!audio) initMusic();
-                    tryPlayMusicOnSlideChange();
-                });
-            }
-
-            console.log('❤️ 生日祝福页面已加载 ❤️');
-            console.log('💡 音乐将在图片切换时自动播放（需用户手势触发首次）');
-        })();
-    </script>
-</body>
-</html>                transform: translateY(-20vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* 主卡片容器 */
-        .birthday-card {
-            max-width: 1300px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(12px);
-            border-radius: 48px;
-            padding: 24px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.3);
-            z-index: 2;
-            transition: all 0.3s ease;
-        }
-
-        /* 主内容网格布局 */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 0.9fr;
-            gap: 24px;
-            align-items: center;
-        }
-
-        /* 左侧照片轮播区域 */
-        .photo-slider {
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 32px;
-            padding: 20px;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
-        }
-
-        .slider-container {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border-radius: 24px;
-            overflow: hidden;
-            background: #f5e6e8;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .slider-images {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
-        .slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 24px;
-            object-fit: cover;
-        }
-
-        .slide.active {
-            opacity: 1;
-        }
-
-        /* 左右箭头 */
-        .slider-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 44px;
-            height: 44px;
-            background: rgba(255, 255, 255, 0.85);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff6b81;
-            transition: all 0.3s;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            z-index: 10;
-            backdrop-filter: blur(4px);
-        }
-
-        .slider-btn:hover {
-            background: #ff6b81;
-            color: white;
-            transform: translateY(-50%) scale(1.05);
-        }
-
-        .slider-btn.prev {
-            left: 12px;
-        }
-
-        .slider-btn.next {
-            right: 12px;
-        }
-
-        /* 轮播指示器 */
-        .slider-dots {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .dot.active {
-            width: 24px;
-            border-radius: 6px;
-            background: #ff4757;
-        }
-
-        /* 右侧情话语录区域 */
-        .love-quotes {
-            background: rgba(255, 248, 245, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 32px 24px;
-            text-align: center;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            min-height: 480px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .quote-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            opacity: 0.7;
-        }
-
-        .quote-text {
-            font-size: 1.5rem;
-            line-height: 1.5;
-            color: #2c3e50;
-            font-weight: 500;
-            letter-spacing: 1px;
-            transition: opacity 0.4s ease;
-        }
-
-        .quote-author {
-            margin-top: 30px;
-            font-size: 1rem;
-            color: #ff6b81;
-            font-weight: 600;
-            letter-spacing: 2px;
-        }
-
-        /* 音乐控制按钮 - 新增 */
-        .music-control {
-            margin-top: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .music-btn {
-            padding: 8px 22px;
-            background: rgba(255, 107, 129, 0.2);
-            border: 1.5px solid #ff6b81;
-            border-radius: 40px;
-            color: #ff6b81;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(4px);
-            letter-spacing: 1px;
-        }
-
-        .music-btn:hover {
-            background: #ff6b81;
-            color: white;
-        }
-
-        .music-btn.playing {
-            background: #ff6b81;
-            color: white;
-            border-color: #ff6b81;
-        }
-
-        .music-status {
-            font-size: 0.85rem;
-            color: #888;
-            letter-spacing: 0.5px;
-        }
-
-        /* Canvas爱心特效区域 */
-        .heart-canvas-wrapper {
-            margin-top: 30px;
-            text-align: center;
-        }
-
-        canvas#heartCanvas {
-            max-width: 100%;
-            border-radius: 20px;
-            background: rgba(255, 240, 245, 0.3);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        /* 特殊完结点 爱心烟花动画层 */
-        .final-animation-layer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.5s ease;
-            flex-direction: column;
-        }
-
-        .final-animation-layer.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .final-blessing {
-            text-align: center;
-            z-index: 1001;
-            color: white;
-        }
-
-        .final-blessing h1 {
-            font-size: 2.4rem;
-            margin-bottom: 20px;
-            text-shadow: 0 0 20px rgba(255, 107, 129, 0.8);
-            animation: glowPulse 1.5s infinite;
-        }
-
-        .final-blessing p {
-            font-size: 1.3rem;
-            letter-spacing: 2px;
-        }
-
-        @keyframes glowPulse {
-            0%,
-            100% {
-                text-shadow: 0 0 20px #ff6b81;
-            }
-            50% {
-                text-shadow: 0 0 40px #ff4757, 0 0 60px #ff6b81;
-            }
-        }
-
-        .close-final {
-            margin-top: 40px;
-            padding: 12px 28px;
-            background: #ff6b81;
-            border: none;
-            border-radius: 40px;
-            color: white;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        /* 手机响应式适配 */
-        @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-            .birthday-card {
-                padding: 16px;
-            }
-            .quote-text {
-                font-size: 1.2rem;
-            }
-            .slider-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 22px;
-            }
-            .love-quotes {
-                min-height: 300px;
-                padding: 24px 16px;
-            }
-            .music-btn {
-                padding: 6px 16px;
-                font-size: 0.8rem;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <div class="floating-hearts" id="floatingHearts"></div>
-
-    <div class="birthday-card">
-        <div class="content-grid">
-            <!-- 左侧照片轮播区 -->
-            <div class="photo-slider">
-                <div class="slider-container">
-                    <div class="slider-images" id="sliderImages">
-                        <!-- 照片由 JS 动态生成 -->
-                    </div>
-                    <button class="slider-btn prev" id="prevBtn">‹</button>
-                    <button class="slider-btn next" id="nextBtn">›</button>
-                </div>
-                <div class="slider-dots" id="sliderDots"></div>
-            </div>
-
-            <!-- 右侧情话语录区 -->
-            <div class="love-quotes" id="loveQuotes">
-                <div class="quote-icon">🌸💖🌸</div>
-                <div class="quote-text" id="quoteText">爱你是最美的冒险</div>
-                <div class="quote-author">— To My Love —</div>
-                <!-- 音乐控制区域 -->
-                <div class="music-control">
-                    <button class="music-btn" id="musicToggleBtn">🎵 播放音乐</button>
-                    <span class="music-status" id="musicStatus">点击播放</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- 爱心粒子特效画布 -->
-        <div class="heart-canvas-wrapper">
-            <canvas id="heartCanvas" width="400" height="300" style="width:100%; height:auto; max-width:500px; aspect-ratio:400/300"></canvas>
-        </div>
-    </div>
-
-    <!-- 终极爱心烟花动画层 -->
-    <div class="final-animation-layer" id="finalLayer">
-        <canvas id="fireworkCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
-        <div class="final-blessing">
-            <h1>❤️ 年年岁岁，岁岁年年 ❤️</h1>
-            <p>爱你的我永远陪在你身边<br />生日快乐，我亲爱的宝贝</p>
-            <button class="close-final" onclick="closeFinalLayer()">✨ 永远爱你 ✨</button>
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            // ============================================================
-            //  ★★★ 音乐文件名已修改为您指定的名称 ★★★
-            //  请确保音乐文件「Christina Perri - a thousand years.mp3」
-            //  与 index.html 放在同一个文件夹下。
-            // ============================================================
-            const musicUrl = "Christina Perri - a thousand years.mp3";
-
-            // 照片列表（请将 photo1.jpg ~ photo14.jpg 放在相同目录）
-            const photos = [
-                "photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg", "photo5.jpg",
-                "photo6.jpg", "photo7.jpg", "photo8.jpg", "photo9.jpg", "photo10.jpg",
-                "photo11.jpg", "photo12.jpg", "photo13.jpg", "photo14.jpg"
-            ];
-            // 与照片对应的情话语录
-            const quotes = [
-                "💕 我们的故事，从那一刻开始，就注定浪漫",
-                "🌟 你的微笑是全世界最美的风景",
-                "🎀 你让平凡的日子都闪着光",
-                "🍬 你比糖果还要甜，比阳光还要暖",
-                "✨ 遇见你是我最大的幸运",
-                "💖 和你在一起的每个瞬间都值得珍藏",
-                "🌸 你是我心动的唯一理由",
-                "🌈 世界万物，你是我的欢喜",
-                "🌹 和你一起，连空气都是甜的",
-                "🍁 所有的美好，都与你有关",
-                "🌟 我的世界因你而完整",
-                "🎈 你是心动，是偏爱，是例外",
-                "💝 爱你这件事，我从未动摇",
-                "🎂 宝贝，生日快乐，今天你是全世界最幸福的女孩"
-            ];
-
-            // ---------- DOM 元素 ----------
-            const sliderImages = document.getElementById('sliderImages');
-            const sliderDots = document.getElementById('sliderDots');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const quoteTextElem = document.getElementById('quoteText');
-            const musicToggleBtn = document.getElementById('musicToggleBtn');
-            const musicStatus = document.getElementById('musicStatus');
-
-            let currentIndex = 0;
-            let slideInterval;
-            let audio = null;
-            let isMusicPlaying = false;
-            let musicReady = false;
-
-            // 动态生成幻灯片及小圆点
-            function buildSlider() {
-                sliderImages.innerHTML = '';
-                photos.forEach((photo, idx) => {
-                    const img = document.createElement('img');
-                    img.src = photo;
-                    img.alt = `回忆${idx+1}`;
-                    img.className = 'slide';
-                    if (idx === 0) img.classList.add('active');
-                    img.onerror = function() {
-                        this.src = 'https://via.placeholder.com/500x500?text=Love+Memory';
-                    };
-                    sliderImages.appendChild(img);
-                });
-                sliderDots.innerHTML = '';
-                photos.forEach((_, idx) => {
-                    const dot = document.createElement('div');
-                    dot.className = 'dot';
-                    if (idx === 0) dot.classList.add('active');
-                    dot.addEventListener('click', () => goToSlide(idx));
-                    sliderDots.appendChild(dot);
-                });
-            }
-
-            function updateActiveSlide(index) {
-                const slides = document.querySelectorAll('.slide');
-                slides.forEach((slide, i) => {
-                    if (i === index) slide.classList.add('active');
-                    else slide.classList.remove('active');
-                });
-                const dots = document.querySelectorAll('.dot');
-                dots.forEach((dot, i) => {
-                    if (i === index) dot.classList.add('active');
-                    else dot.classList.remove('active');
-                });
-                if (quotes[index]) {
-                    quoteTextElem.style.opacity = '0';
-                    setTimeout(() => {
-                        quoteTextElem.innerText = quotes[index];
-                        quoteTextElem.style.opacity = '1';
-                    }, 150);
-                } else {
-                    quoteTextElem.innerText = "💖 永远爱你 💖";
-                }
-            }
-
-            function goToSlide(index) {
-                if (index < 0) index = photos.length - 1;
-                if (index >= photos.length) {
-                    triggerFinalAnimation();
-                    return;
-                }
-                currentIndex = index;
-                updateActiveSlide(currentIndex);
-                resetAutoSlide();
-            }
-
-            function nextSlide() {
-                let nextIdx = currentIndex + 1;
-                if (nextIdx >= photos.length) {
-                    triggerFinalAnimation();
-                    return;
-                }
-                goToSlide(nextIdx);
-            }
-
-            function prevSlide() {
-                let prevIdx = currentIndex - 1;
-                if (prevIdx < 0) prevIdx = 0;
-                goToSlide(prevIdx);
-            }
-
-            function resetAutoSlide() {
-                if (slideInterval) clearInterval(slideInterval);
-                slideInterval = setInterval(() => {
-                    if (currentIndex + 1 >= photos.length) {
-                        triggerFinalAnimation();
-                    } else {
-                        nextSlide();
-                    }
-                }, 5500);
-            }
-
-            // ============================================================
-            //  ★★★ 音乐播放核心逻辑 ★★★
-            // ============================================================
-            function initMusic() {
-                if (audio) return;
-
-                audio = document.createElement('audio');
-                audio.id = 'bgMusic';
-                audio.loop = true;
-                audio.preload = 'auto';
-                // 使用 encodeURI 处理文件名中的空格和特殊字符
-                audio.src = encodeURI(musicUrl);
-                document.body.appendChild(audio);
-
-                audio.addEventListener('canplaythrough', function() {
-                    musicReady = true;
-                    musicStatus.textContent = '🎵 点击播放';
-                    musicStatus.style.color = '#4CAF50';
-                });
-
-                audio.addEventListener('error', function(e) {
-                    console.error('音乐加载失败:', e);
-                    musicStatus.textContent = '⚠️ 音乐文件未找到';
-                    musicStatus.style.color = '#e74c3c';
-                    musicToggleBtn.textContent = '🎵 重试';
-                });
-
-                audio.addEventListener('play', function() {
-                    isMusicPlaying = true;
-                    musicToggleBtn.textContent = '🔊 暂停音乐';
-                    musicToggleBtn.classList.add('playing');
-                    musicStatus.textContent = '🎵 播放中...';
-                    musicStatus.style.color = '#4CAF50';
-                });
-
-                audio.addEventListener('pause', function() {
-                    isMusicPlaying = false;
-                    musicToggleBtn.textContent = '🎵 播放音乐';
-                    musicToggleBtn.classList.remove('playing');
-                    musicStatus.textContent = '⏸️ 已暂停';
-                    musicStatus.style.color = '#888';
-                });
-
-                tryAutoPlay();
-            }
-
-            function tryAutoPlay() {
-                if (!audio) return;
-                audio.play().catch(err => {
-                    console.log('自动播放被阻止，等待用户点击');
-                    musicStatus.textContent = '👆 点击播放音乐';
-                    musicStatus.style.color = '#ff6b81';
-                });
-            }
-
-            function toggleMusic() {
-                if (!audio) {
-                    initMusic();
-                    setTimeout(() => {
-                        if (audio) toggleMusic();
-                    }, 300);
-                    return;
-                }
-
-                if (!musicReady) {
-                    musicStatus.textContent = '⏳ 加载中...';
-                    audio.load();
-                    setTimeout(() => {
-                        if (musicReady) {
-                            toggleMusic();
-                        } else {
-                            musicStatus.textContent = '⏳ 请稍后...';
-                        }
-                    }, 500);
-                    return;
-                }
-
-                if (isMusicPlaying) {
-                    audio.pause();
-                } else {
-                    audio.play().catch(err => {
-                        console.error('播放失败:', err);
-                        musicStatus.textContent = '❌ 播放失败，请重试';
-                        musicStatus.style.color = '#e74c3c';
-                        isMusicPlaying = false;
-                        musicToggleBtn.textContent = '🎵 重试';
-                        musicToggleBtn.classList.remove('playing');
-                    });
-                }
-            }
-
-            function autoPlayOnUserInteraction() {
-                if (!audio) initMusic();
-                if (audio && musicReady && !isMusicPlaying) {
-                    audio.play().catch(() => {});
-                }
-                document.removeEventListener('touchstart', autoPlayOnUserInteraction);
-                document.removeEventListener('click', autoPlayOnUserInteraction);
-            }
-
-            // 终极动画触发
-            let finalTriggered = false;
-
-            function triggerFinalAnimation() {
-                if (finalTriggered) return;
-                finalTriggered = true;
-                if (slideInterval) clearInterval(slideInterval);
-                const finalLayer = document.getElementById('finalLayer');
-                finalLayer.classList.add('show');
-                initFireworks();
-            }
-
-            window.closeFinalLayer = function() {
-                const finalLayer = document.getElementById('finalLayer');
-                finalLayer.classList.remove('show');
-                cancelFireworks();
-            };
-
-            // ============================================================
-            //  爱心粒子 Canvas
-            // ============================================================
-            const canvas = document.getElementById('heartCanvas');
-            const ctx = canvas.getContext('2d');
-            let width = canvas.clientWidth;
-            let height = canvas.clientHeight;
-
-            function resizeCanvas() {
-                const rect = canvas.parentElement.getBoundingClientRect();
-                width = Math.min(rect.width * 0.9, 500);
-                height = width * 0.75;
-                canvas.width = width;
-                canvas.height = height;
-            }
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-
-            class Particle {
-                constructor(x, y, vx, vy, size, alpha) {
-                    this.x = x;
-                    this.y = y;
-                    this.vx = vx;
-                    this.vy = vy;
-                    this.size = size;
-                    this.alpha = alpha;
-                    this.gravity = 0.05;
-                }
-                update() {
-                    this.x += this.vx;
-                    this.y += this.vy;
-                    this.vy += this.gravity;
-                    this.alpha -= 0.008;
-                    return this.alpha > 0;
-                }
-                draw(ctx) {
-                    ctx.save();
-                    ctx.shadowBlur = 8;
-                    ctx.shadowColor = "#ffa0b0";
-                    ctx.globalAlpha = this.alpha;
-                    ctx.fillStyle = `hsl(${Math.sin(Date.now() * 0.002) * 10 + 350}, 80%, 65%)`;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                }
-            }
-
-            let particles = [];
-            let heartPoints = [];
-
-            function generateHeartPoints() {
-                const points = [];
-                const scale = Math.min(width, height) * 0.38;
-                const cx = width / 2,
-                    cy = height / 2 - 5;
-                for (let t = 0; t <= Math.PI * 2; t += 0.08) {
-                    let x = 16 * Math.pow(Math.sin(t), 3);
-                    let y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
-                    let px = cx + x * scale / 16;
-                    let py = cy - y * scale / 16;
-                    points.push({ x: px, y: py });
-                }
-                return points;
-            }
-
-            function initHeartParticles() {
-                heartPoints = generateHeartPoints();
-                for (let i = 0; i < 400; i++) {
-                    let rand = Math.floor(Math.random() * heartPoints.length);
-                    let base = heartPoints[rand];
-                    let angle = Math.random() * Math.PI * 2;
-                    let speed = 0.6 + Math.random() * 1.2;
-                    let vx = Math.cos(angle) * speed;
-                    let vy = Math.sin(angle) * speed - 1.2;
-                    let size = 2 + Math.random() * 4;
-                    let particle = new Particle(base.x, base.y, vx, vy, size, 0.85);
-                    particles.push(particle);
-                }
-            }
-
-            function animateHeart() {
-                if (!ctx) return;
-                ctx.clearRect(0, 0, width, height);
-                ctx.globalCompositeOperation = 'source-over';
-                ctx.shadowBlur = 0;
-                for (let i = particles.length - 1; i >= 0; i--) {
-                    let keep = particles[i].update();
-                    particles[i].draw(ctx);
-                    if (!keep) {
-                        particles.splice(i, 1);
-                        let rand = Math.floor(Math.random() * heartPoints.length);
-                        let base = heartPoints[rand];
-                        let angle = Math.random() * Math.PI * 2;
-                        let speed = 0.5 + Math.random();
-                        let vx = Math.cos(angle) * speed;
-                        let vy = Math.sin(angle) * speed - 0.8;
-                        let size = 2 + Math.random() * 3.5;
-                        let newParticle = new Particle(base.x, base.y, vx, vy, size, 0.8);
-                        particles.push(newParticle);
-                    }
-                }
-                requestAnimationFrame(animateHeart);
-            }
-
-            initHeartParticles();
-            animateHeart();
-
-            // ============================================================
-            //  烟花特效（终极动画）
-            // ============================================================
-            let fireworkCtx, fireworkCanvas, fireworkAnimationId;
-
-            function initFireworks() {
-                fireworkCanvas = document.getElementById('fireworkCanvas');
-                if (!fireworkCanvas) return;
-                fireworkCanvas.width = window.innerWidth;
-                fireworkCanvas.height = window.innerHeight;
-                fireworkCtx = fireworkCanvas.getContext('2d');
-                let fParticles = [];
-
-                function createFireworkExplosion(x, y) {
-                    for (let i = 0; i < 80; i++) {
-                        let angle = Math.random() * Math.PI * 2;
-                        let speed = 2 + Math.random() * 5;
-                        let vx = Math.cos(angle) * speed;
-                        let vy = Math.sin(angle) * speed;
-                        let life = 1;
-                        let color = `hsl(${Math.random() * 60 + 340}, 90%, 65%)`;
-                        fParticles.push({ x, y, vx, vy, life, color, size: 3 + Math.random() * 4 });
-                    }
-                }
-                for (let burst = 0; burst < 8; burst++) {
-                    let randX = Math.random() * fireworkCanvas.width;
-                    let randY = Math.random() * fireworkCanvas.height * 0.6 + 50;
-                    createFireworkExplosion(randX, randY);
-                }
-
-                function updateFireworks() {
-                    if (!fireworkCtx) return;
-                    fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
-                    let allDead = true;
-                    for (let i = 0; i < fParticles.length; i++) {
-                        let p = fParticles[i];
-                        p.x += p.vx;
-                        p.y += p.vy;
-                        p.vy += 0.1;
-                        p.life -= 0.015;
-                        if (p.life > 0) {
-                            allDead = false;
-                            fireworkCtx.globalAlpha = p.life;
-                            fireworkCtx.fillStyle = p.color;
-                            fireworkCtx.beginPath();
-                            fireworkCtx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
-                            fireworkCtx.fill();
-                        }
-                    }
-                    if (!allDead) {
-                        fireworkAnimationId = requestAnimationFrame(updateFireworks);
-                    } else {
-                        fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
-                    }
-                }
-                if (fireworkAnimationId) cancelAnimationFrame(fireworkAnimationId);
-                updateFireworks();
-                window.addEventListener('resize', () => {
-                    if (fireworkCanvas) {
-                        fireworkCanvas.width = window.innerWidth;
-                        fireworkCanvas.height = window.innerHeight;
-                    }
-                });
-            }
-
-            function cancelFireworks() {
-                if (fireworkAnimationId) cancelAnimationFrame(fireworkAnimationId);
-                if (fireworkCtx) fireworkCtx.clearRect(0, 0, fireworkCanvas.width, fireworkCanvas.height);
-            }
-
-            // ============================================================
-            //  背景飘浮爱心
-            // ============================================================
-            function generateFloatingHearts() {
-                const container = document.getElementById('floatingHearts');
-                setInterval(() => {
-                    const heart = document.createElement('div');
-                    heart.className = 'heart-bg';
-                    heart.innerHTML = ['❤️', '💖', '💗', '💓', '💕', '🌸', '🎀', '✨', '🌟'][Math.floor(Math.random() * 9)];
-                    heart.style.left = Math.random() * 100 + '%';
-                    heart.style.fontSize = (16 + Math.random() * 30) + 'px';
-                    heart.style.animationDuration = (5 + Math.random() * 8) + 's';
-                    heart.style.animationDelay = Math.random() * 3 + 's';
-                    container.appendChild(heart);
-                    setTimeout(() => { if (heart.parentNode) heart.remove(); }, 11000);
-                }, 800);
-            }
-            generateFloatingHearts();
-
-            // ============================================================
-            //  事件绑定与初始化
-            // ============================================================
-            buildSlider();
-            updateActiveSlide(0);
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            resetAutoSlide();
-
-            musicToggleBtn.addEventListener('click', toggleMusic);
-
-            document.addEventListener('touchstart', autoPlayOnUserInteraction, { once: true });
-            document.addEventListener('click', autoPlayOnUserInteraction, { once: true });
 
             if (typeof WeixinJSBridge !== 'undefined') {
                 document.addEventListener('WeixinJSBridgeReady', function() {
                     if (!audio) initMusic();
-                    if (audio && musicReady && !isMusicPlaying) {
-                        audio.play().catch(() => {});
-                    }
+                    tryPlayMusic();
                 });
             }
 
-            window.addEventListener('load', function() {
-                initMusic();
-                setTimeout(() => {
-                    if (audio && !musicReady) {
-                        musicStatus.textContent = '⏳ 加载音乐...';
-                        audio.addEventListener('error', function() {
-                            musicStatus.textContent = '⚠️ 请确认音乐文件名是否正确';
-                            musicStatus.style.color = '#e74c3c';
-                        });
-                    }
-                }, 1000);
-            });
-
-            console.log('❤️ 生日祝福页面已加载 ❤️');
-            console.log('💡 音乐文件: Christina Perri - a thousand years.mp3');
-            console.log('💡 如果音乐不播放，请点击「播放音乐」按钮手动播放');
+            console.log('✅ 页面已加载，音乐将在切换图片时自动播放');
         })();
     </script>
 </body>
