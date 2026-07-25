@@ -8,7 +8,8 @@
     <meta content="telephone=no" name="format-detection" />
     <title>❤️ 生日快乐，我的宝贝 ❤️</title>
     <style>
-        /* ===== 全局重置 ===== */
+        /* ===== 与之前相同的样式，为了简洁此处略写，但完整代码中会包含全部样式 ===== */
+        /* 您可以将之前的样式完整复制过来，或者使用下面精简版（保证功能） */
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +30,6 @@
             overflow-x: hidden;
         }
 
-        /* ===== 飘浮爱心背景 ===== */
         .floating-hearts {
             position: fixed;
             top: 0;
@@ -66,7 +66,6 @@
             }
         }
 
-        /* ===== 主卡片容器 ===== */
         .birthday-card {
             max-width: 1300px;
             width: 100%;
@@ -79,7 +78,6 @@
             transition: all 0.3s ease;
         }
 
-        /* ===== 主内容网格 ===== */
         .content-grid {
             display: grid;
             grid-template-columns: 1fr 0.9fr;
@@ -87,7 +85,6 @@
             align-items: center;
         }
 
-        /* ===== 左侧照片轮播 ===== */
         .photo-slider {
             background: rgba(255, 255, 255, 0.4);
             border-radius: 32px;
@@ -128,7 +125,6 @@
             opacity: 1;
         }
 
-        /* 左右箭头 */
         .slider-btn {
             position: absolute;
             top: 50%;
@@ -161,7 +157,6 @@
             right: 12px;
         }
 
-        /* 轮播指示点 */
         .slider-dots {
             display: flex;
             justify-content: center;
@@ -185,7 +180,6 @@
             background: #ff4757;
         }
 
-        /* ===== 右侧情话语录 ===== */
         .love-quotes {
             background: rgba(255, 248, 245, 0.85);
             backdrop-filter: blur(12px);
@@ -223,7 +217,6 @@
             letter-spacing: 2px;
         }
 
-        /* ===== 音乐控制区 ===== */
         .music-control {
             margin-top: 20px;
             display: flex;
@@ -307,7 +300,15 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* ===== 爱心粒子画布 ===== */
+        .music-status-tip {
+            font-size: 0.75rem;
+            color: #e74c3c;
+            margin-top: 4px;
+            width: 100%;
+            text-align: center;
+            min-height: 1.2em;
+        }
+
         .heart-canvas-wrapper {
             margin-top: 30px;
             text-align: center;
@@ -320,7 +321,6 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* ===== 终极烟花层 ===== */
         .final-animation-layer {
             position: fixed;
             top: 0;
@@ -380,7 +380,6 @@
             transition: 0.3s;
         }
 
-        /* ===== 响应式 ===== */
         @media (max-width: 768px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -416,13 +415,10 @@
     </style>
 </head>
 <body>
-    <!-- 背景浮动爱心 -->
     <div class="floating-hearts" id="floatingHearts"></div>
 
-    <!-- 主卡片 -->
     <div class="birthday-card">
         <div class="content-grid">
-            <!-- 左侧轮播 -->
             <div class="photo-slider">
                 <div class="slider-container">
                     <div class="slider-images" id="sliderImages"></div>
@@ -432,7 +428,6 @@
                 <div class="slider-dots" id="sliderDots"></div>
             </div>
 
-            <!-- 右侧情话 + 音乐 -->
             <div class="love-quotes">
                 <div class="quote-icon">🌸💖🌸</div>
                 <div class="quote-text" id="quoteText">爱你是最美的冒险</div>
@@ -444,16 +439,15 @@
                         <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
                     </div>
                 </div>
+                <div class="music-status-tip" id="musicStatusTip"></div>
             </div>
         </div>
 
-        <!-- 爱心粒子 -->
         <div class="heart-canvas-wrapper">
             <canvas id="heartCanvas" width="400" height="300"></canvas>
         </div>
     </div>
 
-    <!-- 终极烟花 -->
     <div class="final-animation-layer" id="finalLayer">
         <canvas id="fireworkCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
         <div class="final-blessing">
@@ -465,10 +459,10 @@
 
     <script>
         (function() {
-            // ============================
-            // 配置（请按需修改）
-            // ============================
+            // ========== 配置 ==========
+            // 请确保音乐文件名为 "Christina Perri - a thousand years.mp3" 并放在同目录
             const musicUrl = "Christina Perri - a thousand years.mp3";
+
             const photos = [
                 "photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg", "photo5.jpg",
                 "photo6.jpg", "photo7.jpg", "photo8.jpg", "photo9.jpg", "photo10.jpg",
@@ -491,7 +485,7 @@
                 "🎂 宝贝，生日快乐，今天你是全世界最幸福的女孩"
             ];
 
-            // DOM 引用
+            // DOM
             const sliderImages = document.getElementById('sliderImages');
             const sliderDots = document.getElementById('sliderDots');
             const prevBtn = document.getElementById('prevBtn');
@@ -500,6 +494,7 @@
             const musicToggleBtn = document.getElementById('musicToggleBtn');
             const musicProgress = document.getElementById('musicProgress');
             const timeDisplay = document.getElementById('timeDisplay');
+            const musicStatusTip = document.getElementById('musicStatusTip');
 
             let currentIndex = 0;
             let slideInterval;
@@ -507,10 +502,10 @@
             let isMusicPlaying = false;
             let musicReady = false;
             let isSeeking = false;
+            let loadAttempts = 0;
+            const MAX_LOAD_ATTEMPTS = 3;
 
-            // ============================
-            // 轮播构建
-            // ============================
+            // ========== 轮播 ==========
             function buildSlider() {
                 sliderImages.innerHTML = '';
                 photos.forEach((photo, idx) => {
@@ -561,7 +556,7 @@
                 currentIndex = index;
                 updateActiveSlide(currentIndex);
                 resetAutoSlide();
-                tryPlayMusic(); // 每次切换图片尝试播放音乐
+                tryPlayMusic(); // 切换时尝试播放
             }
 
             function nextSlide() {
@@ -583,9 +578,7 @@
                 }, 5500);
             }
 
-            // ============================
-            // 音乐控制
-            // ============================
+            // ========== 音乐 ==========
             function initMusic() {
                 if (audio) return;
                 audio = document.createElement('audio');
@@ -595,76 +588,134 @@
                 audio.src = encodeURI(musicUrl);
                 document.body.appendChild(audio);
 
-                audio.addEventListener('canplaythrough', () => {
+                // 加载成功
+                audio.addEventListener('canplaythrough', function() {
                     musicReady = true;
+                    musicStatusTip.textContent = '';
+                    // 尝试播放
                     tryPlayMusic();
                 });
 
-                audio.addEventListener('error', () => {
-                    console.warn('音乐加载失败，请检查文件路径');
+                // 加载元数据（获取时长）
+                audio.addEventListener('loadedmetadata', function() {
+                    if (audio.duration && isFinite(audio.duration)) {
+                        updateTimeDisplay(0, audio.duration);
+                        musicProgress.max = 100;
+                    } else {
+                        // 时长无效，可能文件损坏或格式不支持
+                        musicStatusTip.textContent = '⚠️ 音乐文件格式或时长异常';
+                    }
                 });
 
-                audio.addEventListener('timeupdate', () => {
-                    if (!isSeeking && audio.duration) {
-                        musicProgress.value = (audio.currentTime / audio.duration) * 100;
+                // 播放中更新进度
+                audio.addEventListener('timeupdate', function() {
+                    if (!isSeeking && audio.duration && isFinite(audio.duration)) {
+                        const progress = (audio.currentTime / audio.duration) * 100;
+                        musicProgress.value = progress;
                         updateTimeDisplay(audio.currentTime, audio.duration);
                     }
                 });
 
-                audio.addEventListener('loadedmetadata', () => {
-                    updateTimeDisplay(0, audio.duration);
-                });
-
-                audio.addEventListener('play', () => {
+                // 播放/暂停状态
+                audio.addEventListener('play', function() {
                     isMusicPlaying = true;
                     musicToggleBtn.textContent = '🔊 暂停';
                     musicToggleBtn.classList.add('playing');
+                    musicStatusTip.textContent = '';
                 });
 
-                audio.addEventListener('pause', () => {
+                audio.addEventListener('pause', function() {
                     isMusicPlaying = false;
                     musicToggleBtn.textContent = '🎵 播放';
                     musicToggleBtn.classList.remove('playing');
                 });
 
+                // 加载错误处理
+                audio.addEventListener('error', function(e) {
+                    console.warn('音乐加载错误:', e);
+                    loadAttempts++;
+                    if (loadAttempts <= MAX_LOAD_ATTEMPTS) {
+                        musicStatusTip.textContent = `⏳ 加载第 ${loadAttempts} 次...`;
+                        // 重新加载
+                        audio.load();
+                    } else {
+                        musicStatusTip.textContent = '⚠️ 音乐文件未找到，请检查文件名';
+                        musicReady = false;
+                    }
+                });
+
+                // 开始加载
                 audio.load();
             }
 
             function tryPlayMusic() {
-                if (!audio) { initMusic(); return; }
+                if (!audio) {
+                    initMusic();
+                    // 延迟重试
+                    setTimeout(() => { if (audio) tryPlayMusic(); }, 300);
+                    return;
+                }
                 if (musicReady && !isMusicPlaying) {
-                    audio.play().catch(() => {});
+                    audio.play().catch(err => {
+                        // 自动播放被阻止，不显示错误，用户点击按钮可播放
+                        console.log('自动播放被阻止，等待用户交互');
+                    });
                 }
             }
 
             function toggleMusic() {
-                if (!audio) { initMusic(); setTimeout(toggleMusic, 300); return; }
+                if (!audio) {
+                    initMusic();
+                    setTimeout(() => { if (audio) toggleMusic(); }, 300);
+                    return;
+                }
                 if (musicReady) {
-                    isMusicPlaying ? audio.pause() : audio.play().catch(() => {});
+                    if (isMusicPlaying) {
+                        audio.pause();
+                    } else {
+                        audio.play().catch(err => {
+                            // 如果播放失败，可能是加载问题，尝试重新加载
+                            musicStatusTip.textContent = '🔄 重试中...';
+                            audio.load();
+                            setTimeout(() => {
+                                audio.play().catch(() => {
+                                    musicStatusTip.textContent = '❌ 播放失败，请检查文件';
+                                });
+                            }, 500);
+                        });
+                    }
                 } else {
+                    // 未准备好，尝试加载
+                    musicStatusTip.textContent = '⏳ 加载中...';
                     audio.load();
+                    // 等待加载完成
+                    audio.addEventListener('canplaythrough', function onReady() {
+                        audio.removeEventListener('canplaythrough', onReady);
+                        musicStatusTip.textContent = '';
+                        toggleMusic(); // 再次尝试播放
+                    });
                 }
             }
 
+            // 进度条控制
             function setupProgressBar() {
                 musicProgress.addEventListener('input', function() {
                     isSeeking = true;
-                    if (audio && audio.duration) {
+                    if (audio && audio.duration && isFinite(audio.duration)) {
                         const seekTime = (parseFloat(this.value) / 100) * audio.duration;
                         updateTimeDisplay(seekTime, audio.duration);
                     }
                 });
                 musicProgress.addEventListener('change', function() {
                     isSeeking = false;
-                    if (audio && audio.duration) {
+                    if (audio && audio.duration && isFinite(audio.duration)) {
                         audio.currentTime = (parseFloat(this.value) / 100) * audio.duration;
                     }
                 });
-                // 点击跳转（移动端支持）
                 musicProgress.addEventListener('click', function(e) {
-                    if (audio && audio.duration) {
+                    if (audio && audio.duration && isFinite(audio.duration)) {
                         const rect = this.getBoundingClientRect();
-                        const x = (e.clientX - rect.left) / rect.width;
+                        const x = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
                         audio.currentTime = x * audio.duration;
                         musicProgress.value = x * 100;
                         updateTimeDisplay(audio.currentTime, audio.duration);
@@ -673,7 +724,10 @@
             }
 
             function updateTimeDisplay(current, duration) {
-                if (!duration) return;
+                if (!duration || !isFinite(duration)) {
+                    timeDisplay.textContent = '0:00 / 0:00';
+                    return;
+                }
                 const fmt = (t) => {
                     const m = Math.floor(t / 60);
                     const s = Math.floor(t % 60);
@@ -682,9 +736,7 @@
                 timeDisplay.textContent = `${fmt(current)} / ${fmt(duration)}`;
             }
 
-            // ============================
-            // 终极烟花
-            // ============================
+            // ========== 终极烟花 ==========
             let finalTriggered = false;
 
             function triggerFinalAnimation() {
@@ -700,9 +752,7 @@
                 cancelFireworks();
             };
 
-            // ============================
-            // 爱心粒子画布
-            // ============================
+            // ========== 爱心粒子 ==========
             const canvas = document.getElementById('heartCanvas');
             const ctx = canvas.getContext('2d');
             let w = canvas.clientWidth || 400,
@@ -803,9 +853,7 @@
             initHeartParticles();
             animateHeart();
 
-            // ============================
-            // 烟花特效
-            // ============================
+            // ========== 烟花 ==========
             let fwCtx, fwCanvas, fwId;
 
             function initFireworks() {
@@ -873,9 +921,7 @@
                 if (fwCtx) fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
             }
 
-            // ============================
-            // 浮动爱心
-            // ============================
+            // ========== 浮动爱心 ==========
             function generateFloatingHearts() {
                 const container = document.getElementById('floatingHearts');
                 setInterval(() => {
@@ -892,9 +938,7 @@
             }
             generateFloatingHearts();
 
-            // ============================
-            // 启动
-            // ============================
+            // ========== 启动 ==========
             buildSlider();
             updateActiveSlide(0);
             prevBtn.addEventListener('click', prevSlide);
@@ -906,9 +950,11 @@
 
             window.addEventListener('load', function() {
                 initMusic();
-                setTimeout(tryPlayMusic, 500);
+                // 延迟尝试播放
+                setTimeout(tryPlayMusic, 600);
             });
 
+            // 微信适配
             if (typeof WeixinJSBridge !== 'undefined') {
                 document.addEventListener('WeixinJSBridgeReady', function() {
                     if (!audio) initMusic();
@@ -916,7 +962,7 @@
                 });
             }
 
-            console.log('✅ 页面已加载，音乐将在切换图片时自动播放');
+            console.log('✅ 页面已加载，如果音乐不播放，请检查文件是否命名为: ' + musicUrl);
         })();
     </script>
 </body>
