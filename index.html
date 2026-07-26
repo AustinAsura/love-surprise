@@ -36,6 +36,10 @@
             --safe-bottom: env(safe-area-inset-bottom, 0px);
             --safe-left: env(safe-area-inset-left, 0px);
             --safe-right: env(safe-area-inset-right, 0px);
+            --card-radius: 48px;
+            --border-offset: -2px;
+            --card-shadow-glow: 0 0 100px rgba(255, 107, 129, 0.12);
+            --card-shadow-glow-strong: 0 0 130px rgba(255, 107, 129, 0.2);
         }
 
         body {
@@ -73,6 +77,7 @@
             pointer-events: none;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
             white-space: nowrap;
+            max-width: calc(100vw - 40px);
         }
         .music-toast.show {
             transform: translateX(-50%) translateY(0);
@@ -235,19 +240,20 @@
             background: var(--card-bg);
             backdrop-filter: blur(18px);
             -webkit-backdrop-filter: blur(18px);
-            border-radius: 48px;
+            border-radius: var(--card-radius);
             padding: 24px;
             box-shadow:
                 0 30px 60px rgba(0, 0, 0, 0.35),
                 0 0 0 1px rgba(255, 255, 255, 0.25),
                 inset 0 0 80px rgba(255, 182, 193, 0.08),
-                0 0 100px rgba(255, 107, 129, 0.12);
+                var(--card-shadow-glow);
             z-index: 2;
             transition: opacity 1.5s ease, transform 0.6s ease;
             opacity: 0;
             position: relative;
             animation: cardGlow 4s ease-in-out infinite;
             margin: 0 auto;
+            overflow: visible;
         }
         @keyframes cardGlow {
             0%,
@@ -255,17 +261,17 @@
                 box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.25), 0 0 80px rgba(255, 107, 129, 0.08);
             }
             50% {
-                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 130px rgba(255, 107, 129, 0.2);
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.35), var(--card-shadow-glow-strong);
             }
         }
         .birthday-card::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 50px;
+            top: var(--border-offset);
+            left: var(--border-offset);
+            right: var(--border-offset);
+            bottom: var(--border-offset);
+            border-radius: calc(var(--card-radius) - var(--border-offset));
             background: linear-gradient(45deg,
                     transparent 30%,
                     rgba(255, 154, 158, 0.5) 45%,
@@ -304,6 +310,7 @@
             letter-spacing: 3px;
             padding: 0 4px;
             filter: drop-shadow(0 0 18px rgba(255, 107, 129, 0.4));
+            word-break: break-word;
         }
         @keyframes gradientShift {
             0% {
@@ -367,6 +374,7 @@
             pointer-events: none;
             animation: shimmer 3.5s ease-in-out infinite;
             z-index: 1;
+            border-radius: 32px;
         }
         @keyframes shimmer {
             0%,
@@ -503,6 +511,7 @@
                     transparent 50%);
             pointer-events: none;
             animation: quoteGlow 6s ease-in-out infinite;
+            border-radius: 32px;
         }
         @keyframes quoteGlow {
             0%,
@@ -543,6 +552,7 @@
             position: relative;
             z-index: 1;
             text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+            word-break: break-word;
         }
         .quote-text.typing {
             border-right: 2px solid #ff6b81;
@@ -637,6 +647,8 @@
             margin-top: 26px;
             text-align: center;
             position: relative;
+            overflow: hidden;
+            border-radius: 22px;
         }
         #heartCanvas {
             max-width: 100%;
@@ -665,6 +677,7 @@
             flex-direction: column;
             padding-top: var(--safe-top);
             padding-bottom: var(--safe-bottom);
+            overflow: hidden;
         }
         .final-animation-layer.show {
             opacity: 1;
@@ -775,15 +788,23 @@
 
         /* ===== 响应式（iPhone 17 Pro / 17 及各种手机） ===== */
         @media (max-width: 768px) {
+            :root {
+                --card-radius: 36px;
+                --border-offset: -1px;
+                --card-shadow-glow: 0 0 40px rgba(255, 107, 129, 0.08);
+                --card-shadow-glow-strong: 0 0 60px rgba(255, 107, 129, 0.12);
+            }
+
             body {
                 padding: calc(12px + var(--safe-top)) calc(12px + var(--safe-right)) calc(12px + var(--safe-bottom)) calc(12px + var(--safe-left));
             }
             .birthday-card {
-                border-radius: 36px;
+                border-radius: var(--card-radius);
                 padding: 18px;
+                overflow: hidden;
             }
             .birthday-card::before {
-                border-radius: 38px;
+                border-radius: var(--card-radius);
             }
             .content-grid {
                 grid-template-columns: 1fr;
@@ -803,6 +824,9 @@
                 padding: 24px 16px;
                 border-radius: 28px;
             }
+            .love-quotes::before {
+                border-radius: 28px;
+            }
             .slider-btn {
                 width: 42px;
                 height: 42px;
@@ -817,6 +841,13 @@
             .photo-slider {
                 padding: 12px;
                 border-radius: 28px;
+            }
+            .photo-slider::after {
+                border-radius: 28px;
+                top: -20%;
+                left: -20%;
+                width: 140%;
+                height: 140%;
             }
             .slider-container {
                 border-radius: 20px;
@@ -843,9 +874,22 @@
                 padding: 8px 16px;
                 border-radius: 24px;
             }
+            .heart-canvas-wrapper {
+                border-radius: 16px;
+            }
+            #heartCanvas {
+                border-radius: 16px;
+            }
         }
 
+        /* iPhone 17 Pro 尺寸（约 430px 逻辑宽度） */
         @media (max-width: 430px) {
+            :root {
+                --card-radius: 32px;
+                --card-shadow-glow: 0 0 30px rgba(255, 107, 129, 0.06);
+                --card-shadow-glow-strong: 0 0 45px rgba(255, 107, 129, 0.1);
+            }
+
             .main-title {
                 font-size: 1.7rem;
             }
@@ -868,10 +912,44 @@
             .love-quotes {
                 min-height: 250px;
                 padding: 20px 14px;
+                border-radius: 24px;
+            }
+            .love-quotes::before {
+                border-radius: 24px;
+            }
+            .photo-slider {
+                border-radius: 24px;
+                padding: 10px;
+            }
+            .photo-slider::after {
+                border-radius: 24px;
+                top: -15%;
+                left: -15%;
+                width: 130%;
+                height: 130%;
+            }
+            .slider-container {
+                border-radius: 18px;
+            }
+            .slide {
+                border-radius: 18px;
+            }
+            .heart-canvas-wrapper {
+                border-radius: 14px;
+            }
+            #heartCanvas {
+                border-radius: 14px;
             }
         }
 
+        /* 极小屏幕备用 */
         @media (max-width: 360px) {
+            :root {
+                --card-radius: 28px;
+                --card-shadow-glow: 0 0 20px rgba(255, 107, 129, 0.04);
+                --card-shadow-glow-strong: 0 0 30px rgba(255, 107, 129, 0.08);
+            }
+
             .main-title {
                 font-size: 1.5rem;
                 letter-spacing: 1px;
@@ -887,8 +965,42 @@
             .final-blessing h1 {
                 font-size: 1.4rem;
             }
+            .birthday-card {
+                padding: 14px;
+            }
+            .love-quotes {
+                padding: 16px 12px;
+                border-radius: 22px;
+            }
+            .love-quotes::before {
+                border-radius: 22px;
+            }
+            .photo-slider {
+                border-radius: 22px;
+                padding: 8px;
+            }
+            .photo-slider::after {
+                border-radius: 22px;
+                top: -10%;
+                left: -10%;
+                width: 120%;
+                height: 120%;
+            }
+            .slider-container {
+                border-radius: 16px;
+            }
+            .slide {
+                border-radius: 16px;
+            }
+            .heart-canvas-wrapper {
+                border-radius: 12px;
+            }
+            #heartCanvas {
+                border-radius: 12px;
+            }
         }
 
+        /* 横屏或宽屏优化 */
         @media (orientation: landscape) and (max-height: 600px) {
             .content-grid {
                 grid-template-columns: 1fr 1fr;
@@ -969,7 +1081,7 @@
 
     <script>
         /* ================================================================
-           华丽浪漫版 - 生日祝福页面（修复手机端音乐播放问题）
+           华丽浪漫版 - 生日祝福页面（修复移动端溢出 + 音乐播放）
            ================================================================ */
         (function() {
             'use strict';
@@ -1040,11 +1152,8 @@
                 return `${m}:${s.toString().padStart(2, '0')}`;
             }
 
-            // 检测是否为微信环境
             const isWechat = /MicroMessenger/i.test(navigator.userAgent);
-            // 检测是否为iOS
             const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-            // 检测是否为移动端
             const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
             // ============================================================
@@ -1224,8 +1333,6 @@
                     const clientY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
                     if (clientX === 0 && clientY === 0) return;
                     spawnClickHeart(clientX, clientY);
-
-                    // 【关键】每次点击屏幕空白处也尝试触发音乐播放
                     musicManager.tryPlay();
                 }
 
@@ -1234,7 +1341,7 @@
             })();
 
             // ============================================================
-            // 音乐管理模块（修复手机端播放问题）
+            // 音乐管理模块
             // ============================================================
             const musicManager = (function() {
                 let audio = null;
@@ -1243,13 +1350,11 @@
                 let playAttempted = false;
                 let audioUnlocked = false;
 
-                // 显示/隐藏音乐提示
                 function showMusicToast(message, icon, duration = 3000) {
                     const toast = dom.musicToast;
                     const textEl = toast.querySelector('.text');
                     const iconEl = toast.querySelector('.icon');
                     const hintEl = toast.querySelector('.tap-hint');
-
                     iconEl.textContent = icon || '🎵';
                     textEl.textContent = message;
                     if (message.includes('点击') || message.includes('轻触')) {
@@ -1257,7 +1362,6 @@
                     } else {
                         hintEl.style.display = 'none';
                     }
-
                     toast.classList.add('show');
                     if (duration > 0) {
                         clearTimeout(toast._hideTimeout);
@@ -1273,7 +1377,6 @@
 
                 function init() {
                     if (audio) return audio;
-
                     audio = document.createElement('audio');
                     audio.id = 'bgMusic';
                     audio.loop = true;
@@ -1282,24 +1385,18 @@
                     audio.volume = 0.7;
                     document.body.appendChild(audio);
 
-                    // 加载完成
                     audio.addEventListener('canplaythrough', () => {
                         ready = true;
-                        console.log('✅ 音频已就绪，可以播放');
-                        // 如果之前尝试过播放但失败了，现在重试
+                        console.log('✅ 音频已就绪');
                         if (playAttempted && !playing) {
                             attemptPlay();
                         }
                     });
-
-                    // 元数据加载
                     audio.addEventListener('loadedmetadata', () => {
                         if (audio.duration && isFinite(audio.duration)) {
                             updateTimeDisplay(0, audio.duration);
                         }
                     });
-
-                    // 时间更新
                     audio.addEventListener('timeupdate', () => {
                         if (!isSeeking && audio.duration && isFinite(audio.duration)) {
                             const progress = (audio.currentTime / audio.duration) * 100;
@@ -1307,48 +1404,28 @@
                             updateTimeDisplay(audio.currentTime, audio.duration);
                         }
                     });
-
-                    // 播放状态
                     audio.addEventListener('play', () => {
                         playing = true;
                         console.log('🎵 音乐开始播放');
                         showMusicToast('浪漫音乐已响起 💖', '🎶', 2500);
-                        // 播放后延迟隐藏提示
                         setTimeout(hideMusicToast, 3000);
                     });
-
-                    audio.addEventListener('pause', () => {
-                        playing = false;
-                        console.log('⏸️ 音乐已暂停');
-                    });
-
-                    audio.addEventListener('ended', () => {
-                        playing = false;
-                    });
-
-                    // 错误处理
-                    audio.addEventListener('error', (e) => {
-                        console.warn('⚠️ 音乐加载失败:', audio.error);
+                    audio.addEventListener('pause', () => { playing = false; });
+                    audio.addEventListener('error', () => {
+                        console.warn('⚠️ 音乐加载失败');
                         showMusicToast('音乐文件加载失败，请检查文件', '⚠️', 5000);
                     });
-
-                    // 开始加载
                     audio.load();
 
-                    // 微信环境特殊处理
                     if (isWechat) {
                         setupWechatAudio();
                     }
-
                     return audio;
                 }
 
-                // 微信环境音频准备
                 function setupWechatAudio() {
-                    // WeixinJSBridge 可能已经就绪
                     if (typeof WeixinJSBridge !== 'undefined') {
                         WeixinJSBridge.invoke('getNetworkType', {}, function() {
-                            // 通过 WeixinJSBridge 准备音频通道
                             if (audio && ready) {
                                 audio.play().then(() => {
                                     audio.pause();
@@ -1360,8 +1437,6 @@
                             }
                         });
                     }
-
-                    // 监听 WeixinJSBridgeReady 事件
                     document.addEventListener('WeixinJSBridgeReady', function() {
                         WeixinJSBridge.invoke('getNetworkType', {}, function() {
                             if (audio && ready) {
@@ -1370,13 +1445,10 @@
                                     audio.currentTime = 0;
                                     playing = false;
                                     audioUnlocked = true;
-                                    console.log('✅ 微信音频通道已解锁（通过事件）');
                                 }).catch(() => {});
                             }
                         });
                     }, false);
-
-                    // 微信页面可见性变化时尝试恢复播放
                     document.addEventListener('visibilitychange', function() {
                         if (!document.hidden && playAttempted && !playing && audio && ready) {
                             attemptPlay();
@@ -1384,33 +1456,22 @@
                     });
                 }
 
-                // 尝试播放音频（核心方法）
                 function attemptPlay() {
                     if (!audio) {
                         init();
                         audio = document.querySelector('#bgMusic') || init();
                     }
-
                     if (!audio) return;
-
                     playAttempted = true;
-
-                    // 如果正在播放，不需要操作
                     if (playing) return;
-
                     const playPromise = audio.play();
-
                     if (playPromise !== undefined) {
                         playPromise.then(() => {
-                            console.log('✅ 播放成功');
                             playing = true;
                             audioUnlocked = true;
                             hideMusicToast();
                         }).catch((err) => {
-                            console.log('⏳ 播放被阻止，等待用户交互:', err.name);
                             playing = false;
-
-                            // 根据错误类型给出不同提示
                             if (err.name === 'NotAllowedError') {
                                 if (isWechat) {
                                     showMusicToast('轻触屏幕或滑动照片播放音乐 🎵', '🎵', 0);
@@ -1419,13 +1480,7 @@
                                 } else {
                                     showMusicToast('点击屏幕开始播放音乐 🎵', '🎵', 0);
                                 }
-                            } else if (err.name === 'NotSupportedError') {
-                                showMusicToast('音频格式不支持，请检查文件', '⚠️', 5000);
-                            } else {
-                                showMusicToast('播放失败，请尝试点击按钮', '⚠️', 4000);
                             }
-
-                            // iOS Safari 需要在用户手势中解锁音频上下文
                             if (isIOS && !audioUnlocked) {
                                 unlockIOSAudio();
                             }
@@ -1433,7 +1488,6 @@
                     }
                 }
 
-                // iOS 音频上下文解锁
                 function unlockIOSAudio() {
                     const unlockHandler = function() {
                         if (audioUnlocked) {
@@ -1441,29 +1495,24 @@
                             document.removeEventListener('click', unlockHandler);
                             return;
                         }
-
                         if (audio && ready) {
                             audio.play().then(() => {
                                 audio.pause();
                                 audio.currentTime = 0;
                                 playing = false;
                                 audioUnlocked = true;
-                                console.log('✅ iOS音频上下文已解锁');
                                 document.removeEventListener('touchstart', unlockHandler);
                                 document.removeEventListener('click', unlockHandler);
-                                // 解锁后自动尝试播放
                                 setTimeout(() => attemptPlay(), 100);
                             }).catch(() => {});
                         }
                     };
-
                     document.addEventListener('touchstart', unlockHandler, { once: false, passive: true });
                     document.addEventListener('click', unlockHandler, { once: false });
                 }
 
-                // 公开的播放方法
                 function tryPlay() {
-                    if (playing) return; // 已经在播放
+                    if (playing) return;
                     if (!audio || !ready) {
                         init();
                     }
@@ -1472,10 +1521,7 @@
 
                 function getAudio() { return audio; }
 
-                // 初始化
                 const audioInstance = init();
-
-                // 移动端在开场动画期间显示提示
                 if (isMobile) {
                     setTimeout(() => {
                         if (!playing && !audioUnlocked) {
@@ -1516,7 +1562,6 @@
                     dot.className = 'dot' + (idx === 0 ? ' active' : '');
                     dot.addEventListener('click', () => {
                         goToSlide(idx);
-                        // 点击指示点也触发音乐
                         musicManager.tryPlay();
                     });
                     dotsContainer.appendChild(dot);
@@ -1545,10 +1590,8 @@
             function updateSlide(index, useTypewriter = false) {
                 const slides = dom.sliderImages.querySelectorAll('.slide');
                 slides.forEach((el, i) => el.classList.toggle('active', i === index));
-
                 const dots = dom.sliderDots.querySelectorAll('.dot');
                 dots.forEach((el, i) => el.classList.toggle('active', i === index));
-
                 if (CONFIG.quotes[index]) {
                     if (useTypewriter && index !== 0) {
                         typewriterEffect(CONFIG.quotes[index], dom.quoteText);
@@ -1572,7 +1615,6 @@
                 }
                 currentIndex = index;
                 updateSlide(currentIndex, true);
-                // 切换幻灯片时尝试播放音乐
                 musicManager.tryPlay();
             }
 
@@ -1595,7 +1637,6 @@
                 musicManager.tryPlay();
             });
 
-            // 键盘支持
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'ArrowLeft') prevSlide();
                 if (e.key === 'ArrowRight') nextSlide();
@@ -1630,7 +1671,6 @@
                         audio.currentTime = (parseFloat(this.value) / 100) * audio.duration;
                     }
                 });
-                // 点击进度条也触发音乐
                 progress.addEventListener('click', function(e) {
                     e.stopPropagation();
                     musicManager.tryPlay();
@@ -1817,7 +1857,6 @@
                     offCtx.font = `bold ${fontSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
                     offCtx.fillStyle = '#fff';
                     offCtx.fillText(text, w / 2, h / 2);
-
                     const imageData = offCtx.getImageData(0, 0, w, h);
                     const data = imageData.data;
                     const pts = [];
@@ -1972,13 +2011,11 @@
                         if (animId) cancelAnimationFrame(animId);
                         dom.introOverlay.classList.add('hide');
                         dom.mainCard.style.opacity = '1';
-                        // 开场动画结束后初始化音乐并尝试播放
                         musicManager.init();
-                        // 延迟尝试播放，等待过渡动画完成
                         setTimeout(() => {
                             musicManager.tryPlay();
                         }, 500);
-                        console.log('✅ 开场动画结束，进入主页面');
+                        console.log('✅ 开场动画结束');
                     }
                 }
 
@@ -2096,7 +2133,6 @@
                     fwCtx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
                     fwCtx.fillStyle = 'rgba(0,0,0,0.25)';
                     fwCtx.fillRect(0, 0, fwCanvas.width, fwCanvas.height);
-
                     let alive = false;
                     for (let p of fwParticles) {
                         p.x += p.vx;
@@ -2197,13 +2233,12 @@
             })();
 
             // ============================================================
-            // 7. 全局首次触摸监听（确保音乐能在任何触摸时触发）
+            // 7. 全局首次触摸监听
             // ============================================================
             let globalTouchHandled = false;
             document.addEventListener('touchstart', function() {
                 if (!globalTouchHandled) {
                     globalTouchHandled = true;
-                    // 首次触摸时尝试解锁并播放音乐
                     setTimeout(() => {
                         musicManager.tryPlay();
                     }, 50);
@@ -2226,15 +2261,9 @@
             updateSlide(0);
             setupProgressBar();
 
-            console.log('✅ 华丽浪漫版 - 手机音乐播放已修复 💖');
+            console.log('✅ 华丽浪漫版 - 移动端溢出修复 + 音乐播放 💖');
             console.log('🎵 音乐文件：a_thousand_years.mp3');
             console.log('📱 平台检测：', { isWechat, isIOS, isMobile });
-            console.log('💡 音乐会在以下时机自动尝试播放：');
-            console.log('   - 开场动画结束后');
-            console.log('   - 点击/滑动照片时');
-            console.log('   - 点击屏幕空白处');
-            console.log('   - 点击进度条');
-            console.log('   - 首次触摸屏幕');
         })();
     </script>
 </body>
