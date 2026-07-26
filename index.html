@@ -17,15 +17,12 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* 微信和iOS禁止图片长按菜单 */
         img {
             -webkit-touch-callout: none;
             pointer-events: none;
-            /* 图片不响应点击，避免长按菜单 */
         }
         .slide {
             pointer-events: auto;
-            /* 轮播图本身可交互 */;
         }
 
         :root {
@@ -52,7 +49,58 @@
             position: relative;
             overflow-x: hidden;
             overscroll-behavior: none;
-            /* 适配iPhone灵动岛/刘海 */
+        }
+
+        /* ===== 音乐状态提示条 ===== */
+        .music-toast {
+            position: fixed;
+            top: calc(20px + var(--safe-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 10px 22px;
+            color: #fff;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+        }
+        .music-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        .music-toast .icon {
+            font-size: 1.2rem;
+            animation: musicIconPulse 1.5s ease-in-out infinite;
+        }
+        @keyframes musicIconPulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+        .music-toast .tap-hint {
+            animation: tapHintBlink 1s ease-in-out infinite;
+        }
+        @keyframes tapHintBlink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
         }
 
         /* ===== 星空背景画布 ===== */
@@ -790,9 +838,13 @@
                 font-size: 1rem;
                 letter-spacing: 2px;
             }
+            .music-toast {
+                font-size: 0.75rem;
+                padding: 8px 16px;
+                border-radius: 24px;
+            }
         }
 
-        /* iPhone 17 Pro 尺寸（约 430px 逻辑宽度） */
         @media (max-width: 430px) {
             .main-title {
                 font-size: 1.7rem;
@@ -819,7 +871,6 @@
             }
         }
 
-        /* 极小屏幕备用 */
         @media (max-width: 360px) {
             .main-title {
                 font-size: 1.5rem;
@@ -838,7 +889,6 @@
             }
         }
 
-        /* 横屏或宽屏优化 */
         @media (orientation: landscape) and (max-height: 600px) {
             .content-grid {
                 grid-template-columns: 1fr 1fr;
@@ -855,6 +905,13 @@
     </style>
 </head>
 <body>
+
+    <!-- ===== 音乐状态提示条 ===== -->
+    <div class="music-toast" id="musicToast">
+        <span class="icon">🎵</span>
+        <span class="text">点击屏幕开始播放音乐</span>
+        <span class="tap-hint">👆</span>
+    </div>
 
     <!-- ===== 星空背景画布 ===== -->
     <canvas id="starsCanvas"></canvas>
@@ -875,7 +932,6 @@
     <div class="birthday-card" id="mainCard">
         <div class="main-title">🎂 祝宝贝生日快乐 🎂</div>
         <div class="content-grid">
-            <!-- 左侧照片轮播 -->
             <div class="photo-slider">
                 <div class="slider-container">
                     <div class="slider-images" id="sliderImages"></div>
@@ -884,8 +940,6 @@
                 </div>
                 <div class="slider-dots" id="sliderDots"></div>
             </div>
-
-            <!-- 右侧情话 + 音乐进度条 -->
             <div class="love-quotes">
                 <div class="quote-icon">🌸💖🌸</div>
                 <div class="quote-text" id="quoteText">爱你是最美的冒险</div>
@@ -898,8 +952,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- 爱心粒子画布 -->
         <div class="heart-canvas-wrapper">
             <canvas id="heartCanvas" width="400" height="300"></canvas>
         </div>
@@ -917,16 +969,16 @@
 
     <script>
         /* ================================================================
-           华丽浪漫版 - 生日祝福页面（iPhone 17 / 微信深度适配）
+           华丽浪漫版 - 生日祝福页面（修复手机端音乐播放问题）
            ================================================================ */
         (function() {
             'use strict';
 
             // ============================================================
-            // 配置项（已更新音乐文件名）
+            // 配置项
             // ============================================================
             const CONFIG = {
-                musicFile: 'a_thousand_years.mp3', // 微信中请确保此文件与网页同目录
+                musicFile: 'a_thousand_years.mp3',
                 photos: [
                     'photo1.jpg', 'photo2.jpg', 'photo3.jpg', 'photo4.jpg', 'photo5.jpg',
                     'photo6.jpg', 'photo7.jpg', 'photo8.jpg', 'photo9.jpg', 'photo10.jpg',
@@ -975,6 +1027,7 @@
                 finalLayer: $('finalLayer'),
                 fireworkCanvas: $('fireworkCanvas'),
                 floatingHearts: $('floatingHearts'),
+                musicToast: $('musicToast'),
             };
 
             // ============================================================
@@ -986,6 +1039,13 @@
                 const s = Math.floor(seconds % 60);
                 return `${m}:${s.toString().padStart(2, '0')}`;
             }
+
+            // 检测是否为微信环境
+            const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+            // 检测是否为iOS
+            const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+            // 检测是否为移动端
+            const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent);
 
             // ============================================================
             // 0. 星空背景
@@ -1045,7 +1105,8 @@
                 function animateStars(timestamp) {
                     ctx.clearRect(0, 0, W, H);
                     for (const s of stars) {
-                        const alpha = s.baseAlpha * (0.55 + 0.45 * Math.sin(timestamp * s.twinkleSpeed + s.twinkleOffset));
+                        const alpha = s.baseAlpha * (0.55 + 0.45 * Math.sin(timestamp * s.twinkleSpeed + s
+                            .twinkleOffset));
                         ctx.fillStyle = s.color;
                         ctx.globalAlpha = alpha;
                         ctx.beginPath();
@@ -1058,7 +1119,6 @@
                             ctx.fill();
                         }
                     }
-
                     spawnShootingStar();
                     for (let i = shootingStars.length - 1; i >= 0; i--) {
                         const ss = shootingStars[i];
@@ -1106,7 +1166,8 @@
                     petal.style.animationDelay = '0s';
                     petal.style.opacity = (0.5 + Math.random() * 0.45);
                     petal.style.setProperty('--sway', (Math.random() - 0.5) * 120 + 'px');
-                    petal.style.animation = `petalFall ${7 + Math.random() * 11}s linear forwards, petalSway ${2 + Math.random() * 3}s ease-in-out infinite`;
+                    petal.style.animation =
+                        `petalFall ${7 + Math.random() * 11}s linear forwards, petalSway ${2 + Math.random() * 3}s ease-in-out infinite`;
                     container.appendChild(petal);
                     setTimeout(() => petal.remove(), 14000);
                 }
@@ -1130,7 +1191,7 @@
             })();
 
             // ============================================================
-            // 0.8 点击爱心特效（微信触摸兼容）
+            // 0.8 点击爱心特效
             // ============================================================
             (function initClickHearts() {
                 const heartEmojis = ['❤️', '💖', '💗', '💓', '💕', '💝', '💘', '✨', '💞'];
@@ -1163,10 +1224,267 @@
                     const clientY = e.clientY || (e.touches && e.touches[0]?.clientY) || 0;
                     if (clientX === 0 && clientY === 0) return;
                     spawnClickHeart(clientX, clientY);
+
+                    // 【关键】每次点击屏幕空白处也尝试触发音乐播放
+                    musicManager.tryPlay();
                 }
 
                 document.addEventListener('click', handleInteraction);
                 document.addEventListener('touchstart', handleInteraction, { passive: true });
+            })();
+
+            // ============================================================
+            // 音乐管理模块（修复手机端播放问题）
+            // ============================================================
+            const musicManager = (function() {
+                let audio = null;
+                let ready = false;
+                let playing = false;
+                let playAttempted = false;
+                let audioUnlocked = false;
+
+                // 显示/隐藏音乐提示
+                function showMusicToast(message, icon, duration = 3000) {
+                    const toast = dom.musicToast;
+                    const textEl = toast.querySelector('.text');
+                    const iconEl = toast.querySelector('.icon');
+                    const hintEl = toast.querySelector('.tap-hint');
+
+                    iconEl.textContent = icon || '🎵';
+                    textEl.textContent = message;
+                    if (message.includes('点击') || message.includes('轻触')) {
+                        hintEl.style.display = 'inline';
+                    } else {
+                        hintEl.style.display = 'none';
+                    }
+
+                    toast.classList.add('show');
+                    if (duration > 0) {
+                        clearTimeout(toast._hideTimeout);
+                        toast._hideTimeout = setTimeout(() => {
+                            toast.classList.remove('show');
+                        }, duration);
+                    }
+                }
+
+                function hideMusicToast() {
+                    dom.musicToast.classList.remove('show');
+                }
+
+                function init() {
+                    if (audio) return audio;
+
+                    audio = document.createElement('audio');
+                    audio.id = 'bgMusic';
+                    audio.loop = true;
+                    audio.preload = 'auto';
+                    audio.src = encodeURI(CONFIG.musicFile);
+                    audio.volume = 0.7;
+                    document.body.appendChild(audio);
+
+                    // 加载完成
+                    audio.addEventListener('canplaythrough', () => {
+                        ready = true;
+                        console.log('✅ 音频已就绪，可以播放');
+                        // 如果之前尝试过播放但失败了，现在重试
+                        if (playAttempted && !playing) {
+                            attemptPlay();
+                        }
+                    });
+
+                    // 元数据加载
+                    audio.addEventListener('loadedmetadata', () => {
+                        if (audio.duration && isFinite(audio.duration)) {
+                            updateTimeDisplay(0, audio.duration);
+                        }
+                    });
+
+                    // 时间更新
+                    audio.addEventListener('timeupdate', () => {
+                        if (!isSeeking && audio.duration && isFinite(audio.duration)) {
+                            const progress = (audio.currentTime / audio.duration) * 100;
+                            dom.musicProgress.value = progress;
+                            updateTimeDisplay(audio.currentTime, audio.duration);
+                        }
+                    });
+
+                    // 播放状态
+                    audio.addEventListener('play', () => {
+                        playing = true;
+                        console.log('🎵 音乐开始播放');
+                        showMusicToast('浪漫音乐已响起 💖', '🎶', 2500);
+                        // 播放后延迟隐藏提示
+                        setTimeout(hideMusicToast, 3000);
+                    });
+
+                    audio.addEventListener('pause', () => {
+                        playing = false;
+                        console.log('⏸️ 音乐已暂停');
+                    });
+
+                    audio.addEventListener('ended', () => {
+                        playing = false;
+                    });
+
+                    // 错误处理
+                    audio.addEventListener('error', (e) => {
+                        console.warn('⚠️ 音乐加载失败:', audio.error);
+                        showMusicToast('音乐文件加载失败，请检查文件', '⚠️', 5000);
+                    });
+
+                    // 开始加载
+                    audio.load();
+
+                    // 微信环境特殊处理
+                    if (isWechat) {
+                        setupWechatAudio();
+                    }
+
+                    return audio;
+                }
+
+                // 微信环境音频准备
+                function setupWechatAudio() {
+                    // WeixinJSBridge 可能已经就绪
+                    if (typeof WeixinJSBridge !== 'undefined') {
+                        WeixinJSBridge.invoke('getNetworkType', {}, function() {
+                            // 通过 WeixinJSBridge 准备音频通道
+                            if (audio && ready) {
+                                audio.play().then(() => {
+                                    audio.pause();
+                                    audio.currentTime = 0;
+                                    playing = false;
+                                    audioUnlocked = true;
+                                    console.log('✅ 微信音频通道已解锁');
+                                }).catch(() => {});
+                            }
+                        });
+                    }
+
+                    // 监听 WeixinJSBridgeReady 事件
+                    document.addEventListener('WeixinJSBridgeReady', function() {
+                        WeixinJSBridge.invoke('getNetworkType', {}, function() {
+                            if (audio && ready) {
+                                audio.play().then(() => {
+                                    audio.pause();
+                                    audio.currentTime = 0;
+                                    playing = false;
+                                    audioUnlocked = true;
+                                    console.log('✅ 微信音频通道已解锁（通过事件）');
+                                }).catch(() => {});
+                            }
+                        });
+                    }, false);
+
+                    // 微信页面可见性变化时尝试恢复播放
+                    document.addEventListener('visibilitychange', function() {
+                        if (!document.hidden && playAttempted && !playing && audio && ready) {
+                            attemptPlay();
+                        }
+                    });
+                }
+
+                // 尝试播放音频（核心方法）
+                function attemptPlay() {
+                    if (!audio) {
+                        init();
+                        audio = document.querySelector('#bgMusic') || init();
+                    }
+
+                    if (!audio) return;
+
+                    playAttempted = true;
+
+                    // 如果正在播放，不需要操作
+                    if (playing) return;
+
+                    const playPromise = audio.play();
+
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('✅ 播放成功');
+                            playing = true;
+                            audioUnlocked = true;
+                            hideMusicToast();
+                        }).catch((err) => {
+                            console.log('⏳ 播放被阻止，等待用户交互:', err.name);
+                            playing = false;
+
+                            // 根据错误类型给出不同提示
+                            if (err.name === 'NotAllowedError') {
+                                if (isWechat) {
+                                    showMusicToast('轻触屏幕或滑动照片播放音乐 🎵', '🎵', 0);
+                                } else if (isIOS) {
+                                    showMusicToast('轻触屏幕任意位置播放音乐 🎵', '🎵', 0);
+                                } else {
+                                    showMusicToast('点击屏幕开始播放音乐 🎵', '🎵', 0);
+                                }
+                            } else if (err.name === 'NotSupportedError') {
+                                showMusicToast('音频格式不支持，请检查文件', '⚠️', 5000);
+                            } else {
+                                showMusicToast('播放失败，请尝试点击按钮', '⚠️', 4000);
+                            }
+
+                            // iOS Safari 需要在用户手势中解锁音频上下文
+                            if (isIOS && !audioUnlocked) {
+                                unlockIOSAudio();
+                            }
+                        });
+                    }
+                }
+
+                // iOS 音频上下文解锁
+                function unlockIOSAudio() {
+                    const unlockHandler = function() {
+                        if (audioUnlocked) {
+                            document.removeEventListener('touchstart', unlockHandler);
+                            document.removeEventListener('click', unlockHandler);
+                            return;
+                        }
+
+                        if (audio && ready) {
+                            audio.play().then(() => {
+                                audio.pause();
+                                audio.currentTime = 0;
+                                playing = false;
+                                audioUnlocked = true;
+                                console.log('✅ iOS音频上下文已解锁');
+                                document.removeEventListener('touchstart', unlockHandler);
+                                document.removeEventListener('click', unlockHandler);
+                                // 解锁后自动尝试播放
+                                setTimeout(() => attemptPlay(), 100);
+                            }).catch(() => {});
+                        }
+                    };
+
+                    document.addEventListener('touchstart', unlockHandler, { once: false, passive: true });
+                    document.addEventListener('click', unlockHandler, { once: false });
+                }
+
+                // 公开的播放方法
+                function tryPlay() {
+                    if (playing) return; // 已经在播放
+                    if (!audio || !ready) {
+                        init();
+                    }
+                    attemptPlay();
+                }
+
+                function getAudio() { return audio; }
+
+                // 初始化
+                const audioInstance = init();
+
+                // 移动端在开场动画期间显示提示
+                if (isMobile) {
+                    setTimeout(() => {
+                        if (!playing && !audioUnlocked) {
+                            showMusicToast('轻触屏幕播放浪漫音乐 🎵', '🎵', 0);
+                        }
+                    }, 2000);
+                }
+
+                return { init, tryPlay, getAudio, showMusicToast, hideMusicToast };
             })();
 
             // ============================================================
@@ -1196,7 +1514,11 @@
                 CONFIG.photos.forEach((_, idx) => {
                     const dot = document.createElement('div');
                     dot.className = 'dot' + (idx === 0 ? ' active' : '');
-                    dot.addEventListener('click', () => goToSlide(idx));
+                    dot.addEventListener('click', () => {
+                        goToSlide(idx);
+                        // 点击指示点也触发音乐
+                        musicManager.tryPlay();
+                    });
                     dotsContainer.appendChild(dot);
                 });
             }
@@ -1250,6 +1572,7 @@
                 }
                 currentIndex = index;
                 updateSlide(currentIndex, true);
+                // 切换幻灯片时尝试播放音乐
                 musicManager.tryPlay();
             }
 
@@ -1261,8 +1584,16 @@
                 goToSlide(currentIndex - 1);
             }
 
-            dom.prevBtn.addEventListener('click', prevSlide);
-            dom.nextBtn.addEventListener('click', nextSlide);
+            dom.prevBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                prevSlide();
+                musicManager.tryPlay();
+            });
+            dom.nextBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                nextSlide();
+                musicManager.tryPlay();
+            });
 
             // 键盘支持
             document.addEventListener('keydown', function(e) {
@@ -1271,72 +1602,8 @@
             });
 
             // ============================================================
-            // 2. 音乐管理模块（微信需用户手势触发）
+            // 进度条设置
             // ============================================================
-            const musicManager = (function() {
-                let audio = null;
-                let ready = false;
-                let playing = false;
-                let started = false;
-
-                function init() {
-                    if (audio) return;
-                    audio = document.createElement('audio');
-                    audio.id = 'bgMusic';
-                    audio.loop = true;
-                    audio.preload = 'auto';
-                    audio.src = encodeURI(CONFIG.musicFile);
-                    document.body.appendChild(audio);
-
-                    audio.addEventListener('canplaythrough', () => {
-                        ready = true;
-                        if (started) {
-                            audio.play().catch(() => {});
-                        }
-                    });
-                    audio.addEventListener('loadedmetadata', () => {
-                        if (audio.duration && isFinite(audio.duration)) {
-                            updateTimeDisplay(0, audio.duration);
-                        }
-                    });
-                    audio.addEventListener('timeupdate', () => {
-                        if (!isSeeking && audio.duration && isFinite(audio.duration)) {
-                            const progress = (audio.currentTime / audio.duration) * 100;
-                            dom.musicProgress.value = progress;
-                            updateTimeDisplay(audio.currentTime, audio.duration);
-                        }
-                    });
-                    audio.addEventListener('play', () => { playing = true; });
-                    audio.addEventListener('pause', () => { playing = false; });
-                    audio.addEventListener('error', () => {
-                        console.warn('⚠️ 音乐加载失败，请检查文件路径');
-                    });
-                    audio.load();
-                }
-
-                function tryPlay() {
-                    if (!audio) {
-                        init();
-                        started = true;
-                        return;
-                    }
-                    if (!started) {
-                        started = true;
-                        if (ready) {
-                            audio.play().catch(() => {});
-                        }
-                    } else {
-                        if (ready && !playing) {
-                            audio.play().catch(() => {});
-                        }
-                    }
-                }
-
-                function getAudio() { return audio; }
-
-                return { init, tryPlay, getAudio };
-            })();
-
             let isSeeking = false;
 
             function setupProgressBar() {
@@ -1362,6 +1629,15 @@
                     if (audio && audio.duration && isFinite(audio.duration)) {
                         audio.currentTime = (parseFloat(this.value) / 100) * audio.duration;
                     }
+                });
+                // 点击进度条也触发音乐
+                progress.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    musicManager.tryPlay();
+                });
+                progress.addEventListener('touchstart', function(e) {
+                    e.stopPropagation();
+                    musicManager.tryPlay();
                 });
             }
 
@@ -1411,7 +1687,8 @@
                         ctx.shadowBlur = 10;
                         ctx.shadowColor = `hsla(${this.hue}, 80%, 65%, 0.5)`;
                         ctx.globalAlpha = this.alpha;
-                        ctx.fillStyle = `hsl(${this.hue}, 80%, ${60 + Math.sin(timestamp * 0.005 + this.x) * 10}%)`;
+                        ctx.fillStyle =
+                            `hsl(${this.hue}, 80%, ${60 + Math.sin(timestamp * 0.005 + this.x) * 10}%)`;
                         ctx.beginPath();
                         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                         ctx.fill();
@@ -1695,7 +1972,13 @@
                         if (animId) cancelAnimationFrame(animId);
                         dom.introOverlay.classList.add('hide');
                         dom.mainCard.style.opacity = '1';
+                        // 开场动画结束后初始化音乐并尝试播放
                         musicManager.init();
+                        // 延迟尝试播放，等待过渡动画完成
+                        setTimeout(() => {
+                            musicManager.tryPlay();
+                        }, 500);
+                        console.log('✅ 开场动画结束，进入主页面');
                     }
                 }
 
@@ -1914,26 +2197,44 @@
             })();
 
             // ============================================================
-            // 7. 初始化
+            // 7. 全局首次触摸监听（确保音乐能在任何触摸时触发）
+            // ============================================================
+            let globalTouchHandled = false;
+            document.addEventListener('touchstart', function() {
+                if (!globalTouchHandled) {
+                    globalTouchHandled = true;
+                    // 首次触摸时尝试解锁并播放音乐
+                    setTimeout(() => {
+                        musicManager.tryPlay();
+                    }, 50);
+                }
+            }, { once: false, passive: true });
+
+            document.addEventListener('click', function() {
+                if (!globalTouchHandled) {
+                    globalTouchHandled = true;
+                    setTimeout(() => {
+                        musicManager.tryPlay();
+                    }, 50);
+                }
+            }, { once: false });
+
+            // ============================================================
+            // 8. 初始化
             // ============================================================
             buildSlider();
             updateSlide(0);
             setupProgressBar();
 
-            // 微信环境下尝试预初始化音频（但播放仍需手势）
-            if (typeof WeixinJSBridge !== 'undefined') {
-                document.addEventListener('WeixinJSBridgeReady', function() {
-                    musicManager.init();
-                });
-            } else {
-                // 非微信环境也预初始化
-                musicManager.init();
-            }
-
-            console.log('✅ 华丽浪漫版 - iPhone 17 / 微信适配完毕 💖');
+            console.log('✅ 华丽浪漫版 - 手机音乐播放已修复 💖');
             console.log('🎵 音乐文件：a_thousand_years.mp3');
-            console.log('💡 点击屏幕任意位置会有爱心飘出哦~');
-            console.log('💡 浏览完所有照片会触发终极烟花秀~');
+            console.log('📱 平台检测：', { isWechat, isIOS, isMobile });
+            console.log('💡 音乐会在以下时机自动尝试播放：');
+            console.log('   - 开场动画结束后');
+            console.log('   - 点击/滑动照片时');
+            console.log('   - 点击屏幕空白处');
+            console.log('   - 点击进度条');
+            console.log('   - 首次触摸屏幕');
         })();
     </script>
 </body>
