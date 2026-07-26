@@ -8,8 +8,7 @@
     <meta content="telephone=no" name="format-detection" />
     <title>❤️ 生日快乐，我的宝贝 ❤️</title>
     <style>
-        /* ===== 与之前相同的样式，为了简洁此处略写，但完整代码中会包含全部样式 ===== */
-        /* 您可以将之前的样式完整复制过来，或者使用下面精简版（保证功能） */
+        /* ===== 全局重置 ===== */
         * {
             margin: 0;
             padding: 0;
@@ -30,6 +29,67 @@
             overflow-x: hidden;
         }
 
+        /* ===== 开场动画遮罩层 ===== */
+        #introOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a0a1a, #0d0d0d);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 1.5s ease;
+        }
+        #introOverlay.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #introCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        /* 进度提示（可选） */
+        #introProgress {
+            position: absolute;
+            bottom: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            letter-spacing: 2px;
+            font-weight: 300;
+            text-shadow: 0 0 10px rgba(255, 107, 129, 0.3);
+            z-index: 2;
+        }
+
+        /* ===== 主页面标题（新增） ===== */
+        .main-title {
+            text-align: center;
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff6b81, #ff9a9e, #fbc2eb, #ff6b81);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+            text-shadow: 0 4px 20px rgba(255, 107, 129, 0.3);
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ===== 其他原有样式 ===== */
         .floating-hearts {
             position: fixed;
             top: 0;
@@ -50,20 +110,10 @@
         }
 
         @keyframes floatHeart {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.3;
-            }
-            90% {
-                opacity: 0.3;
-            }
-            100% {
-                transform: translateY(-20vh) rotate(360deg);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; }
         }
 
         .birthday-card {
@@ -150,12 +200,8 @@
             transform: translateY(-50%) scale(1.05);
         }
 
-        .slider-btn.prev {
-            left: 12px;
-        }
-        .slider-btn.next {
-            right: 12px;
-        }
+        .slider-btn.prev { left: 12px; }
+        .slider-btn.next { right: 12px; }
 
         .slider-dots {
             display: flex;
@@ -226,32 +272,6 @@
             flex-wrap: wrap;
         }
 
-        .music-btn {
-            padding: 6px 16px;
-            background: rgba(255, 107, 129, 0.2);
-            border: 1.5px solid #ff6b81;
-            border-radius: 40px;
-            color: #ff6b81;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            backdrop-filter: blur(4px);
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-
-        .music-btn:hover {
-            background: #ff6b81;
-            color: white;
-        }
-
-        .music-btn.playing {
-            background: #ff6b81;
-            color: white;
-            border-color: #ff6b81;
-        }
-
         .progress-container {
             flex: 1;
             min-width: 120px;
@@ -298,15 +318,6 @@
             min-width: 80px;
             text-align: center;
             font-variant-numeric: tabular-nums;
-        }
-
-        .music-status-tip {
-            font-size: 0.75rem;
-            color: #e74c3c;
-            margin-top: 4px;
-            width: 100%;
-            text-align: center;
-            min-height: 1.2em;
         }
 
         .heart-canvas-wrapper {
@@ -400,10 +411,6 @@
                 min-height: 300px;
                 padding: 24px 16px;
             }
-            .music-btn {
-                padding: 4px 12px;
-                font-size: 0.8rem;
-            }
             .progress-container {
                 min-width: 80px;
             }
@@ -411,14 +418,31 @@
                 font-size: 0.65rem;
                 min-width: 60px;
             }
+            .main-title {
+                font-size: 2rem;
+                margin-bottom: 14px;
+            }
         }
     </style>
 </head>
 <body>
+
+    <!-- ========== 开场动画遮罩 ========== -->
+    <div id="introOverlay">
+        <canvas id="introCanvas"></canvas>
+        <div id="introProgress">✨ 为你汇聚祝福 ✨</div>
+    </div>
+
+    <!-- ========== 背景浮动爱心 ========== -->
     <div class="floating-hearts" id="floatingHearts"></div>
 
-    <div class="birthday-card">
+    <!-- ========== 主卡片 ========== -->
+    <div class="birthday-card" id="mainCard" style="opacity:0; transition: opacity 1s;">
+        <!-- 新增标题 -->
+        <div class="main-title">🎂 祝宝贝生日快乐 🎂</div>
+
         <div class="content-grid">
+            <!-- 左侧轮播 -->
             <div class="photo-slider">
                 <div class="slider-container">
                     <div class="slider-images" id="sliderImages"></div>
@@ -428,26 +452,27 @@
                 <div class="slider-dots" id="sliderDots"></div>
             </div>
 
+            <!-- 右侧情话 + 音乐 -->
             <div class="love-quotes">
                 <div class="quote-icon">🌸💖🌸</div>
                 <div class="quote-text" id="quoteText">爱你是最美的冒险</div>
                 <div class="quote-author">— To My Love —</div>
                 <div class="music-control">
-                    <button class="music-btn" id="musicToggleBtn">🎵 播放</button>
                     <div class="progress-container">
                         <input type="range" class="progress-bar" id="musicProgress" value="0" step="0.01" />
                         <span class="time-display" id="timeDisplay">0:00 / 0:00</span>
                     </div>
                 </div>
-                <div class="music-status-tip" id="musicStatusTip"></div>
             </div>
         </div>
 
+        <!-- 爱心粒子 -->
         <div class="heart-canvas-wrapper">
             <canvas id="heartCanvas" width="400" height="300"></canvas>
         </div>
     </div>
 
+    <!-- ========== 终极烟花 ========== -->
     <div class="final-animation-layer" id="finalLayer">
         <canvas id="fireworkCanvas" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></canvas>
         <div class="final-blessing">
@@ -460,9 +485,7 @@
     <script>
         (function() {
             // ========== 配置 ==========
-            // 请确保音乐文件名为 "Christina Perri - a thousand years.mp3" 并放在同目录
             const musicUrl = "Christina Perri - a thousand years.mp3";
-
             const photos = [
                 "photo1.jpg", "photo2.jpg", "photo3.jpg", "photo4.jpg", "photo5.jpg",
                 "photo6.jpg", "photo7.jpg", "photo8.jpg", "photo9.jpg", "photo10.jpg",
@@ -485,25 +508,22 @@
                 "🎂 宝贝，生日快乐，今天你是全世界最幸福的女孩"
             ];
 
-            // DOM
+            // ========== DOM 主功能 ==========
             const sliderImages = document.getElementById('sliderImages');
             const sliderDots = document.getElementById('sliderDots');
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const quoteTextElem = document.getElementById('quoteText');
-            const musicToggleBtn = document.getElementById('musicToggleBtn');
             const musicProgress = document.getElementById('musicProgress');
             const timeDisplay = document.getElementById('timeDisplay');
-            const musicStatusTip = document.getElementById('musicStatusTip');
+            const mainCard = document.getElementById('mainCard');
 
             let currentIndex = 0;
-            let slideInterval;
             let audio = null;
             let isMusicPlaying = false;
             let musicReady = false;
             let isSeeking = false;
-            let loadAttempts = 0;
-            const MAX_LOAD_ATTEMPTS = 3;
+            let musicStarted = false;
 
             // ========== 轮播 ==========
             function buildSlider() {
@@ -555,8 +575,7 @@
                 }
                 currentIndex = index;
                 updateActiveSlide(currentIndex);
-                resetAutoSlide();
-                tryPlayMusic(); // 切换时尝试播放
+                startOrPlayMusic();
             }
 
             function nextSlide() {
@@ -565,17 +584,6 @@
 
             function prevSlide() {
                 goToSlide(currentIndex - 1);
-            }
-
-            function resetAutoSlide() {
-                if (slideInterval) clearInterval(slideInterval);
-                slideInterval = setInterval(() => {
-                    if (currentIndex + 1 >= photos.length) {
-                        triggerFinalAnimation();
-                    } else {
-                        nextSlide();
-                    }
-                }, 5500);
             }
 
             // ========== 音乐 ==========
@@ -588,26 +596,19 @@
                 audio.src = encodeURI(musicUrl);
                 document.body.appendChild(audio);
 
-                // 加载成功
                 audio.addEventListener('canplaythrough', function() {
                     musicReady = true;
-                    musicStatusTip.textContent = '';
-                    // 尝试播放
-                    tryPlayMusic();
-                });
-
-                // 加载元数据（获取时长）
-                audio.addEventListener('loadedmetadata', function() {
-                    if (audio.duration && isFinite(audio.duration)) {
-                        updateTimeDisplay(0, audio.duration);
-                        musicProgress.max = 100;
-                    } else {
-                        // 时长无效，可能文件损坏或格式不支持
-                        musicStatusTip.textContent = '⚠️ 音乐文件格式或时长异常';
+                    if (musicStarted) {
+                        audio.play().catch(() => {});
                     }
                 });
 
-                // 播放中更新进度
+                audio.addEventListener('loadedmetadata', function() {
+                    if (audio.duration && isFinite(audio.duration)) {
+                        updateTimeDisplay(0, audio.duration);
+                    }
+                });
+
                 audio.addEventListener('timeupdate', function() {
                     if (!isSeeking && audio.duration && isFinite(audio.duration)) {
                         const progress = (audio.currentTime / audio.duration) * 100;
@@ -616,88 +617,39 @@
                     }
                 });
 
-                // 播放/暂停状态
                 audio.addEventListener('play', function() {
                     isMusicPlaying = true;
-                    musicToggleBtn.textContent = '🔊 暂停';
-                    musicToggleBtn.classList.add('playing');
-                    musicStatusTip.textContent = '';
                 });
 
                 audio.addEventListener('pause', function() {
                     isMusicPlaying = false;
-                    musicToggleBtn.textContent = '🎵 播放';
-                    musicToggleBtn.classList.remove('playing');
                 });
 
-                // 加载错误处理
-                audio.addEventListener('error', function(e) {
-                    console.warn('音乐加载错误:', e);
-                    loadAttempts++;
-                    if (loadAttempts <= MAX_LOAD_ATTEMPTS) {
-                        musicStatusTip.textContent = `⏳ 加载第 ${loadAttempts} 次...`;
-                        // 重新加载
-                        audio.load();
-                    } else {
-                        musicStatusTip.textContent = '⚠️ 音乐文件未找到，请检查文件名';
-                        musicReady = false;
-                    }
+                audio.addEventListener('error', function() {
+                    console.warn('音乐加载失败，请检查文件');
                 });
 
-                // 开始加载
                 audio.load();
             }
 
-            function tryPlayMusic() {
+            function startOrPlayMusic() {
                 if (!audio) {
                     initMusic();
-                    // 延迟重试
-                    setTimeout(() => { if (audio) tryPlayMusic(); }, 300);
+                    musicStarted = true;
                     return;
                 }
-                if (musicReady && !isMusicPlaying) {
-                    audio.play().catch(err => {
-                        // 自动播放被阻止，不显示错误，用户点击按钮可播放
-                        console.log('自动播放被阻止，等待用户交互');
-                    });
-                }
-            }
-
-            function toggleMusic() {
-                if (!audio) {
-                    initMusic();
-                    setTimeout(() => { if (audio) toggleMusic(); }, 300);
-                    return;
-                }
-                if (musicReady) {
-                    if (isMusicPlaying) {
-                        audio.pause();
-                    } else {
-                        audio.play().catch(err => {
-                            // 如果播放失败，可能是加载问题，尝试重新加载
-                            musicStatusTip.textContent = '🔄 重试中...';
-                            audio.load();
-                            setTimeout(() => {
-                                audio.play().catch(() => {
-                                    musicStatusTip.textContent = '❌ 播放失败，请检查文件';
-                                });
-                            }, 500);
-                        });
+                if (!musicStarted) {
+                    musicStarted = true;
+                    if (musicReady) {
+                        audio.play().catch(() => {});
                     }
                 } else {
-                    // 未准备好，尝试加载
-                    musicStatusTip.textContent = '⏳ 加载中...';
-                    audio.load();
-                    // 等待加载完成
-                    audio.addEventListener('canplaythrough', function onReady() {
-                        audio.removeEventListener('canplaythrough', onReady);
-                        musicStatusTip.textContent = '';
-                        toggleMusic(); // 再次尝试播放
-                    });
+                    if (musicReady && !isMusicPlaying) {
+                        audio.play().catch(() => {});
+                    }
                 }
             }
 
-            // 进度条控制
             function setupProgressBar() {
                 musicProgress.addEventListener('input', function() {
                     isSeeking = true;
@@ -742,7 +694,6 @@
             function triggerFinalAnimation() {
                 if (finalTriggered) return;
                 finalTriggered = true;
-                if (slideInterval) clearInterval(slideInterval);
                 document.getElementById('finalLayer').classList.add('show');
                 initFireworks();
             }
@@ -752,7 +703,7 @@
                 cancelFireworks();
             };
 
-            // ========== 爱心粒子 ==========
+            // ========== 爱心粒子（原有） ==========
             const canvas = document.getElementById('heartCanvas');
             const ctx = canvas.getContext('2d');
             let w = canvas.clientWidth || 400,
@@ -938,31 +889,241 @@
             }
             generateFloatingHearts();
 
-            // ========== 启动 ==========
+            // ========== 开场动画 ==========
+            const introOverlay = document.getElementById('introOverlay');
+            const introCanvas = document.getElementById('introCanvas');
+            const iCtx = introCanvas.getContext('2d');
+            let introW, introH;
+
+            function resizeIntroCanvas() {
+                introW = window.innerWidth;
+                introH = window.innerHeight;
+                introCanvas.width = introW;
+                introCanvas.height = introH;
+            }
+            resizeIntroCanvas();
+            window.addEventListener('resize', resizeIntroCanvas);
+
+            // 粒子系统
+            const TOTAL_PARTICLES = 600;
+            let iParts = [];
+            let targetPoints = [];
+            let currentPhase = 0; // 0:生, 1:日, 2:快, 3:乐, 4:🎂
+            const phases = ['生', '日', '快', '乐', '🎂'];
+            let phaseProgress = 0; // 0~1，用于控制汇聚程度
+            let phaseFinished = false;
+            let animId = null;
+            let introComplete = false;
+
+            // 获取文字像素点
+            function getTextPoints(text, fontSize, color = '#ffffff') {
+                const offscreen = document.createElement('canvas');
+                const offCtx = offscreen.getContext('2d');
+                // 估算大小
+                offscreen.width = introW * 0.9;
+                offscreen.height = introH * 0.8;
+                offCtx.clearRect(0, 0, offscreen.width, offscreen.height);
+                offCtx.fillStyle = '#000';
+                offCtx.fillRect(0, 0, offscreen.width, offscreen.height);
+                offCtx.textAlign = 'center';
+                offCtx.textBaseline = 'middle';
+                offCtx.font = `bold ${fontSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+                offCtx.fillStyle = color;
+                offCtx.fillText(text, offscreen.width/2, offscreen.height/2);
+
+                const imageData = offCtx.getImageData(0, 0, offscreen.width, offscreen.height);
+                const data = imageData.data;
+                const points = [];
+                // 采样步长，控制点数
+                const step = 3;
+                for (let y = 0; y < offscreen.height; y += step) {
+                    for (let x = 0; x < offscreen.width; x += step) {
+                        const index = (y * offscreen.width + x) * 4;
+                        // 如果亮度大于阈值
+                        if (data[index] > 128) {
+                            // 映射到屏幕坐标（居中）
+                            const scaleX = introW / offscreen.width;
+                            const scaleY = introH / offscreen.height;
+                            points.push({
+                                x: x * scaleX,
+                                y: y * scaleY
+                            });
+                        }
+                    }
+                }
+                return points;
+            }
+
+            // 初始化粒子
+            function initIntroParticles() {
+                iParts = [];
+                for (let i = 0; i < TOTAL_PARTICLES; i++) {
+                    iParts.push({
+                        x: Math.random() * introW,
+                        y: Math.random() * introH,
+                        targetX: 0,
+                        targetY: 0,
+                        vx: 0,
+                        vy: 0,
+                        size: 2 + Math.random() * 4,
+                        color: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                        speed: 0.06 + Math.random() * 0.04
+                    });
+                }
+            }
+
+            // 设置当前阶段的目标点
+            function setPhaseTargets(phaseIndex) {
+                const text = phases[phaseIndex];
+                let fontSize = Math.min(introW, introH) * 0.35;
+                if (text === '🎂') fontSize *= 0.8; // emoji 稍小
+                const pts = getTextPoints(text, fontSize);
+                if (pts.length === 0) {
+                    // 如果没取到点，用备用
+                    console.warn('未获取到文字像素，使用备用点');
+                    for (let i = 0; i < TOTAL_PARTICLES; i++) {
+                        pts.push({
+                            x: introW/2 + (Math.random()-0.5)*introW*0.5,
+                            y: introH/2 + (Math.random()-0.5)*introH*0.5
+                        });
+                    }
+                }
+                targetPoints = pts;
+                // 为每个粒子分配目标（随机分配，可重复）
+                for (let i = 0; i < iParts.length; i++) {
+                    const idx = Math.floor(Math.random() * targetPoints.length);
+                    const t = targetPoints[idx];
+                    iParts[i].targetX = t.x;
+                    iParts[i].targetY = t.y;
+                }
+                phaseProgress = 0;
+                phaseFinished = false;
+            }
+
+            // 更新粒子位置
+            function updateIntroParticles() {
+                let allReached = true;
+                const speedFactor = 0.04; // 移动速度
+                for (let p of iParts) {
+                    const dx = p.targetX - p.x;
+                    const dy = p.targetY - p.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist > 1) {
+                        allReached = false;
+                        const move = Math.min(dist, speedFactor * dist + 0.5);
+                        p.x += (dx / dist) * move;
+                        p.y += (dy / dist) * move;
+                        // 随机抖动
+                        p.x += (Math.random() - 0.5) * 0.3;
+                        p.y += (Math.random() - 0.5) * 0.3;
+                    }
+                }
+                phaseProgress = 1 - (allReached ? 0 : 0.1); // 简单进度
+                if (allReached) {
+                    phaseFinished = true;
+                }
+            }
+
+            // 绘制粒子
+            function drawIntro() {
+                iCtx.clearRect(0, 0, introW, introH);
+                // 背景渐变
+                const grad = iCtx.createRadialGradient(introW/2, introH/2, 0, introW/2, introH/2, Math.max(introW, introH)*0.8);
+                grad.addColorStop(0, '#2a1a2a');
+                grad.addColorStop(1, '#0a0a0a');
+                iCtx.fillStyle = grad;
+                iCtx.fillRect(0, 0, introW, introH);
+
+                // 画粒子
+                for (let p of iParts) {
+                    iCtx.shadowBlur = 12;
+                    iCtx.shadowColor = p.color;
+                    iCtx.fillStyle = p.color;
+                    iCtx.beginPath();
+                    iCtx.arc(p.x, p.y, p.size * (0.8 + 0.4 * Math.sin(Date.now() / 1000 + p.x)), 0, Math.PI*2);
+                    iCtx.fill();
+                }
+                // 画当前文字提示（小字）
+                iCtx.shadowBlur = 0;
+                iCtx.fillStyle = 'rgba(255,255,255,0.15)';
+                iCtx.font = '20px "PingFang SC", sans-serif';
+                iCtx.textAlign = 'center';
+                iCtx.textBaseline = 'bottom';
+                iCtx.fillText(`✨ ${phases[currentPhase]} ✨`, introW/2, introH - 40);
+            }
+
+            // 阶段推进
+            function advancePhase() {
+                if (currentPhase < phases.length - 1) {
+                    currentPhase++;
+                    setPhaseTargets(currentPhase);
+                } else {
+                    // 全部完成
+                    introComplete = true;
+                    if (animId) cancelAnimationFrame(animId);
+                    // 隐藏遮罩，显示主页面
+                    introOverlay.classList.add('hide');
+                    mainCard.style.opacity = '1';
+                    // 尝试播放音乐（由用户切换触发，但我们可以预加载）
+                    initMusic();
+                    // 触发第一次切换时音乐启动，但这里不强制播放，留给用户操作
+                }
+            }
+
+            // 主循环
+            function introLoop() {
+                if (introComplete) return;
+                updateIntroParticles();
+                drawIntro();
+                if (phaseFinished) {
+                    // 停留片刻，然后进入下一阶段
+                    setTimeout(() => {
+                        if (!introComplete) advancePhase();
+                    }, 800);
+                    // 暂停循环，等定时器结束后重新启动
+                    if (animId) cancelAnimationFrame(animId);
+                    // 但为了连续，我们重新调度
+                    setTimeout(() => {
+                        if (!introComplete) {
+                            animId = requestAnimationFrame(introLoop);
+                        }
+                    }, 900);
+                    return;
+                }
+                animId = requestAnimationFrame(introLoop);
+            }
+
+            // 启动开场动画
+            function startIntro() {
+                initIntroParticles();
+                setPhaseTargets(0);
+                introLoop();
+            }
+
+            // ========== 初始化主功能 ==========
             buildSlider();
             updateActiveSlide(0);
             prevBtn.addEventListener('click', prevSlide);
             nextBtn.addEventListener('click', nextSlide);
-            resetAutoSlide();
-
-            musicToggleBtn.addEventListener('click', toggleMusic);
             setupProgressBar();
-
-            window.addEventListener('load', function() {
-                initMusic();
-                // 延迟尝试播放
-                setTimeout(tryPlayMusic, 600);
-            });
 
             // 微信适配
             if (typeof WeixinJSBridge !== 'undefined') {
                 document.addEventListener('WeixinJSBridgeReady', function() {
-                    if (!audio) initMusic();
-                    tryPlayMusic();
+                    // 预加载音乐
+                    initMusic();
                 });
             }
 
-            console.log('✅ 页面已加载，如果音乐不播放，请检查文件是否命名为: ' + musicUrl);
+            // ========== 启动页面 ==========
+            // 先隐藏主卡片，显示开场动画
+            mainCard.style.opacity = '0';
+            // 延迟启动动画（确保DOM渲染）
+            setTimeout(() => {
+                startIntro();
+            }, 100);
+
+            console.log('✅ 页面已加载，开场动画开始...');
         })();
     </script>
 </body>
